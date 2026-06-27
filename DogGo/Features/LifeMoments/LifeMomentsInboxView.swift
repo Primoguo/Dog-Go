@@ -13,6 +13,13 @@ struct LifeMomentsInboxView: View {
 
                 ScrollView {
                     LazyVStack(spacing: 12) {
+                        if events.isEmpty {
+                            ContentUnavailableView(
+                                "还没有新片段",
+                                systemImage: "moon.zzz",
+                                description: Text("等你下次回来，\(dogName)也许会有新故事。")
+                            )
+                        }
                         ForEach(events) { event in
                             NavigationLink {
                                 LifeMomentView(event: event, dogName: dogName)

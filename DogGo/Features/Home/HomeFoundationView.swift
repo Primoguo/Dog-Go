@@ -13,6 +13,9 @@ struct HomeFoundationView: View {
     @State private var loadError: String?
     @State private var showingQuietCompany = false
     @State private var showingOurDays = false
+#if DEBUG
+    @State private var showingDebugPanel = false
+#endif
 
     init(dog: DogProfile) {
         self.dog = dog
@@ -30,6 +33,15 @@ struct HomeFoundationView: View {
 
             VStack(spacing: 0) {
                 HStack {
+#if DEBUG
+                    Button { showingDebugPanel = true } label: {
+                        Image(systemName: "wrench.and.screwdriver")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .foregroundStyle(DogGoTheme.Colors.olive)
+                    .accessibilityLabel("打开生活调试台")
+#endif
                     Spacer()
                     Button { showingOurDays = true } label: {
                         Label("我们的日子", systemImage: "book.closed")
@@ -62,10 +74,16 @@ struct HomeFoundationView: View {
                 Spacer()
 
                 if let loadError {
-                    Text(loadError)
-                        .font(DogGoTheme.Typography.caption)
-                        .foregroundStyle(.red.opacity(0.75))
-                        .padding(.bottom, 12)
+                    VStack(spacing: 8) {
+                        Text(loadError)
+                            .font(DogGoTheme.Typography.caption)
+                            .foregroundStyle(.red.opacity(0.75))
+                        Button("重新尝试") { Task { await refreshLife() } }
+                            .font(DogGoTheme.Typography.button)
+                            .foregroundStyle(DogGoTheme.Colors.olive)
+                    }
+                    .padding(.bottom, 12)
+                    .accessibilityElement(children: .combine)
                 }
 
                 Button {
@@ -120,10 +138,17 @@ struct HomeFoundationView: View {
             OurDaysView(dogID: dog.id, dogName: dog.name)
                 .presentationDetents([.large])
         }
+#if DEBUG
+        .sheet(isPresented: $showingDebugPanel) {
+            DebugPanelView(dog: dog)
+                .presentationDetents([.large])
+        }
+#endif
     }
 
     @MainActor
     private func refreshLife() async {
+        loadError = nil
         do {
             _ = try FirstExperienceService().ensureFirstMeeting(for: dog, in: modelContext)
             if let state = states.first {

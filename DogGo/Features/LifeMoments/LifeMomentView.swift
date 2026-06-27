@@ -105,6 +105,7 @@ struct LifeMomentView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     .padding(.top, 10)
                                     .disabled(isSavingResponse)
+                                    .accessibilityHint("保存回应，并影响未来的生活片段")
                             }
                         }
 
@@ -125,6 +126,7 @@ struct LifeMomentView: View {
             }
         }
         .task { markViewed() }
+        .accessibilityAction(named: "关闭片段") { dismiss() }
     }
 
     private func markViewed() {

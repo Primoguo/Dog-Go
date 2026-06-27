@@ -10,11 +10,11 @@ enum DogGoTheme {
     }
 
     enum Typography {
-        static let title = Font.system(size: 36, weight: .medium, design: .serif)
-        static let headline = Font.system(size: 23, weight: .medium, design: .serif)
-        static let body = Font.system(size: 18, weight: .regular, design: .serif)
-        static let caption = Font.system(size: 15, weight: .regular, design: .serif)
-        static let button = Font.system(size: 17, weight: .semibold, design: .rounded)
+        static let title = Font.system(.largeTitle, design: .serif, weight: .medium)
+        static let headline = Font.system(.title2, design: .serif, weight: .medium)
+        static let body = Font.system(.body, design: .serif, weight: .regular)
+        static let caption = Font.system(.subheadline, design: .serif, weight: .regular)
+        static let button = Font.system(.body, design: .rounded, weight: .semibold)
     }
 
     enum Spacing {
