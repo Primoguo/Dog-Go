@@ -3,6 +3,7 @@ import SwiftUI
 
 struct HomeFoundationView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Query private var states: [DogState]
     @Query(sort: \LifeEventRecord.occurredAt, order: .reverse) private var events: [LifeEventRecord]
 
@@ -87,7 +88,11 @@ struct HomeFoundationView: View {
             .padding(.horizontal, DogGoTheme.Spacing.page)
             .padding(.bottom, 32)
         }
-        .task { await prepareFirstExperience() }
+        .task { await refreshLife() }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            Task { await refreshLife() }
+        }
         .sheet(item: $selectedEvent) { event in
             LifeMomentView(event: event, dogName: dog.name)
                 .presentationDetents([.large])
@@ -99,9 +104,16 @@ struct HomeFoundationView: View {
     }
 
     @MainActor
-    private func prepareFirstExperience() async {
+    private func refreshLife() async {
         do {
             _ = try FirstExperienceService().ensureFirstMeeting(for: dog, in: modelContext)
+            if let state = states.first {
+                _ = try OfflineLifeSimulationService().simulate(
+                    for: dog,
+                    state: state,
+                    in: modelContext
+                )
+            }
         } catch {
             loadError = "暂时没能准备好今天的片段。"
         }
