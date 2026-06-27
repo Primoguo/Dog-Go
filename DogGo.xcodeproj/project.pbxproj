@@ -36,6 +36,10 @@
 		A00000000000000000000128 /* FirstExperienceServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000030; };
 		A00000000000000000000129 /* OfflineLifeSimulationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000031; };
 		A00000000000000000000130 /* OfflineLifeSimulationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000032; };
+		A00000000000000000000131 /* LifeMomentResponseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000033; };
+		A00000000000000000000132 /* EventPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000034; };
+		A00000000000000000000133 /* LifeMomentsInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000035; };
+		A00000000000000000000134 /* LifeMomentResponseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000036; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +85,10 @@
 		A00000000000000000000030 /* FirstExperienceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstExperienceServiceTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000031 /* OfflineLifeSimulationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineLifeSimulationService.swift; sourceTree = "<group>"; };
 		A00000000000000000000032 /* OfflineLifeSimulationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineLifeSimulationServiceTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000033 /* LifeMomentResponseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeMomentResponseService.swift; sourceTree = "<group>"; };
+		A00000000000000000000034 /* EventPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventPresentation.swift; sourceTree = "<group>"; };
+		A00000000000000000000035 /* LifeMomentsInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeMomentsInboxView.swift; sourceTree = "<group>"; };
+		A00000000000000000000036 /* LifeMomentResponseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeMomentResponseServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,14 +127,14 @@
 		A00000000000000000000606 /* Home */ = {isa = PBXGroup; children = (A00000000000000000000004 /* HomeFoundationView.swift */,); path = Home; sourceTree = "<group>"; };
 		A00000000000000000000607 /* Domain */ = {isa = PBXGroup; children = (A00000000000000000000611 /* Models */, A00000000000000000000612 /* LifeEngine */, A00000000000000000000615 /* Adoption */,); path = Domain; sourceTree = "<group>"; };
 		A00000000000000000000608 /* DesignSystem */ = {isa = PBXGroup; children = (A00000000000000000000006 /* DogGoTheme.swift */,); path = DesignSystem; sourceTree = "<group>"; };
-		A00000000000000000000609 /* DogGoTests */ = {isa = PBXGroup; children = (A00000000000000000000008 /* DogProfileTests.swift */, A00000000000000000000018 /* EventCatalogTests.swift */, A00000000000000000000022 /* LifeEventSelectorTests.swift */, A00000000000000000000026 /* AdoptionServiceTests.swift */, A00000000000000000000030 /* FirstExperienceServiceTests.swift */, A00000000000000000000032 /* OfflineLifeSimulationServiceTests.swift */,); path = DogGoTests; sourceTree = "<group>"; };
+		A00000000000000000000609 /* DogGoTests */ = {isa = PBXGroup; children = (A00000000000000000000008 /* DogProfileTests.swift */, A00000000000000000000018 /* EventCatalogTests.swift */, A00000000000000000000022 /* LifeEventSelectorTests.swift */, A00000000000000000000026 /* AdoptionServiceTests.swift */, A00000000000000000000030 /* FirstExperienceServiceTests.swift */, A00000000000000000000032 /* OfflineLifeSimulationServiceTests.swift */, A00000000000000000000036 /* LifeMomentResponseServiceTests.swift */,); path = DogGoTests; sourceTree = "<group>"; };
 		A00000000000000000000610 /* Products */ = {isa = PBXGroup; children = (A00000000000000000000009 /* DogGo.app */, A00000000000000000000010 /* DogGoTests.xctest */,); name = Products; sourceTree = "<group>"; };
 		A00000000000000000000611 /* Models */ = {isa = PBXGroup; children = (A00000000000000000000005 /* DogProfile.swift */, A00000000000000000000011 /* DogState.swift */, A00000000000000000000012 /* LifeEventRecord.swift */, A00000000000000000000013 /* MemoryRecord.swift */, A00000000000000000000014 /* Relationship.swift */,); path = Models; sourceTree = "<group>"; };
-		A00000000000000000000612 /* LifeEngine */ = {isa = PBXGroup; children = (A00000000000000000000015 /* EventDefinition.swift */, A00000000000000000000019 /* Clock.swift */, A00000000000000000000020 /* SeededRandomSource.swift */, A00000000000000000000021 /* EventSelection.swift */, A00000000000000000000027 /* LifeEventFactSnapshot.swift */, A00000000000000000000028 /* FirstExperienceService.swift */, A00000000000000000000031 /* OfflineLifeSimulationService.swift */,); path = LifeEngine; sourceTree = "<group>"; };
+		A00000000000000000000612 /* LifeEngine */ = {isa = PBXGroup; children = (A00000000000000000000015 /* EventDefinition.swift */, A00000000000000000000019 /* Clock.swift */, A00000000000000000000020 /* SeededRandomSource.swift */, A00000000000000000000021 /* EventSelection.swift */, A00000000000000000000027 /* LifeEventFactSnapshot.swift */, A00000000000000000000028 /* FirstExperienceService.swift */, A00000000000000000000031 /* OfflineLifeSimulationService.swift */, A00000000000000000000033 /* LifeMomentResponseService.swift */,); path = LifeEngine; sourceTree = "<group>"; };
 		A00000000000000000000613 /* Data */ = {isa = PBXGroup; children = (A00000000000000000000614 /* EventCatalog */,); path = Data; sourceTree = "<group>"; };
 		A00000000000000000000614 /* EventCatalog */ = {isa = PBXGroup; children = (A00000000000000000000016 /* EventCatalog.swift */,); path = EventCatalog; sourceTree = "<group>"; };
 		A00000000000000000000615 /* Adoption */ = {isa = PBXGroup; children = (A00000000000000000000023 /* DogNameValidator.swift */, A00000000000000000000024 /* AdoptionService.swift */,); path = Adoption; sourceTree = "<group>"; };
-		A00000000000000000000616 /* LifeMoments */ = {isa = PBXGroup; children = (A00000000000000000000029 /* LifeMomentView.swift */,); path = LifeMoments; sourceTree = "<group>"; };
+		A00000000000000000000616 /* LifeMoments */ = {isa = PBXGroup; children = (A00000000000000000000029 /* LifeMomentView.swift */, A00000000000000000000034 /* EventPresentation.swift */, A00000000000000000000035 /* LifeMomentsInboxView.swift */,); path = LifeMoments; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -184,8 +192,8 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A00000000000000000000801 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000101, A00000000000000000000102, A00000000000000000000103, A00000000000000000000104, A00000000000000000000105, A00000000000000000000106, A00000000000000000000109, A00000000000000000000110, A00000000000000000000111, A00000000000000000000112, A00000000000000000000113, A00000000000000000000114, A00000000000000000000117, A00000000000000000000118, A00000000000000000000119, A00000000000000000000121, A00000000000000000000122, A00000000000000000000123, A00000000000000000000125, A00000000000000000000126, A00000000000000000000127, A00000000000000000000129,); runOnlyForDeploymentPostprocessing = 0; };
-		A00000000000000000000802 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000108, A00000000000000000000116, A00000000000000000000120, A00000000000000000000124, A00000000000000000000128, A00000000000000000000130,); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000801 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000101, A00000000000000000000102, A00000000000000000000103, A00000000000000000000104, A00000000000000000000105, A00000000000000000000106, A00000000000000000000109, A00000000000000000000110, A00000000000000000000111, A00000000000000000000112, A00000000000000000000113, A00000000000000000000114, A00000000000000000000117, A00000000000000000000118, A00000000000000000000119, A00000000000000000000121, A00000000000000000000122, A00000000000000000000123, A00000000000000000000125, A00000000000000000000126, A00000000000000000000127, A00000000000000000000129, A00000000000000000000131, A00000000000000000000132, A00000000000000000000133,); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000802 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000108, A00000000000000000000116, A00000000000000000000120, A00000000000000000000124, A00000000000000000000128, A00000000000000000000130, A00000000000000000000134,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */

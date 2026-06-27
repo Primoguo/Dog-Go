@@ -9,7 +9,7 @@ struct HomeFoundationView: View {
 
     let dog: DogProfile
 
-    @State private var selectedEvent: LifeEventRecord?
+    @State private var showingMoments = false
     @State private var loadError: String?
     @State private var showingQuietCompany = false
 
@@ -54,7 +54,7 @@ struct HomeFoundationView: View {
                 }
 
                 Button {
-                    selectedEvent = unreadEvents.first ?? events.first
+                    showingMoments = true
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
@@ -93,8 +93,8 @@ struct HomeFoundationView: View {
             guard newPhase == .active else { return }
             Task { await refreshLife() }
         }
-        .sheet(item: $selectedEvent) { event in
-            LifeMomentView(event: event, dogName: dog.name)
+        .sheet(isPresented: $showingMoments) {
+            LifeMomentsInboxView(events: events, dogName: dog.name)
                 .presentationDetents([.large])
         }
         .sheet(isPresented: $showingQuietCompany) {
