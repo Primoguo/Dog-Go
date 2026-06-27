@@ -1,0 +1,319 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "id": "first_meeting",
+      "category": "firstExperience",
+      "timeWindows": ["morning", "daytime", "evening", "night"],
+      "baseWeight": 100,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": [],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": 0, "social": 1, "curiosity": 1 },
+      "memoryOutputTags": ["first_meeting", "noticed_user"],
+      "followUpEventIDs": ["first_short_leave"],
+      "sceneID": "home",
+      "visualTraceID": null,
+      "emotion": "calm",
+      "textVariants": [
+        { "id": "a", "text": "栗子先看了看房间，又看了看你。最后，它安静地向前挪了半步。" }
+      ],
+      "responses": [
+        { "id": "give_space", "label": "给它一点空间", "reactionText": "它没有走远，只是在能看见你的地方坐了下来。", "memoryTags": ["user_respects_space"] },
+        { "id": "soft_greeting", "label": "轻声和它打招呼", "reactionText": "它的一只耳朵转向了你。", "memoryTags": ["user_greets_softly"] },
+        { "id": "quiet_company", "label": "安静陪它一会儿", "reactionText": "你们一起听了一会儿窗外的声音。", "memoryTags": ["shared_quiet"] }
+      ]
+    },
+    {
+      "id": "first_short_leave",
+      "category": "firstExperience",
+      "timeWindows": ["morning", "daytime", "evening", "night"],
+      "baseWeight": 100,
+      "preferredTraits": ["curious", "tidy"],
+      "excludedRecentEventIDs": [],
+      "requiredMemoryTags": ["first_meeting"],
+      "stateEffects": { "mood": 0, "energy": -1, "social": 0, "curiosity": 1 },
+      "memoryOutputTags": ["first_time_alone", "checked_door"],
+      "followUpEventIDs": ["first_memory_reference"],
+      "sceneID": "home",
+      "visualTraceID": "mat_shifted_near_door",
+      "emotion": "calm",
+      "textVariants": [
+        { "id": "a", "text": "你离开后，栗子去门边闻了闻，又把门垫踩歪了一点。后来它自己回到了窗边。" },
+        { "id": "b", "text": "门外安静下来后，栗子检查了门缝，随后选了一个能看见窗户的位置坐下。" }
+      ],
+      "responses": [
+        { "id": "notice_mat", "label": "帮它把门垫摆好", "reactionText": "它认真看着你的手，像是在记住这件事。", "memoryTags": ["user_restores_order"] },
+        { "id": "ask_about_window", "label": "问问窗外有什么", "reactionText": "它回头看了你一眼，又望向了窗外。", "memoryTags": ["user_values_curiosity"] },
+        { "id": "quiet_company", "label": "安静陪它一会儿", "reactionText": "它慢慢趴下，但耳朵还朝着窗户。", "memoryTags": ["shared_quiet"] }
+      ]
+    },
+    {
+      "id": "first_memory_reference",
+      "category": "firstExperience",
+      "timeWindows": ["morning", "daytime", "evening"],
+      "baseWeight": 100,
+      "preferredTraits": [],
+      "excludedRecentEventIDs": [],
+      "requiredMemoryTags": ["first_time_alone"],
+      "stateEffects": { "mood": 1, "energy": 0, "social": 1, "curiosity": 0 },
+      "memoryOutputTags": ["first_response_remembered"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "chosen_resting_spot",
+      "emotion": "happy",
+      "textVariants": [
+        { "id": "respect", "text": "栗子又回到昨天的位置。它记得你没有催它靠近，于是这一次，它主动把垫子拖近了一点。" },
+        { "id": "quiet", "text": "栗子在你们安静待过的位置趴下，像是已经把那里当成共同的角落。" }
+      ],
+      "responses": [
+        { "id": "smile", "label": "对它笑一笑", "reactionText": "它眨了眨眼，没有移开。", "memoryTags": ["gentle_acknowledgement"] },
+        { "id": "quiet_company", "label": "继续安静陪伴", "reactionText": "房间里只剩下缓慢的呼吸声。", "memoryTags": ["shared_quiet"] }
+      ]
+    },
+    {
+      "id": "window_bird_01",
+      "category": "ordinary",
+      "timeWindows": ["morning", "daytime"],
+      "baseWeight": 12,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": ["window_bird_01", "window_bird_02"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": 0, "social": 0, "curiosity": 2 },
+      "memoryOutputTags": ["noticed_bird"],
+      "followUpEventIDs": ["window_bird_02"],
+      "sceneID": "home",
+      "visualTraceID": "nose_mark_on_window",
+      "emotion": "excited",
+      "textVariants": [
+        { "id": "a", "text": "一只小鸟落在窗沿外。栗子屏住呼吸看了很久，鼻尖在玻璃上留下一点雾。" },
+        { "id": "b", "text": "栗子在窗边保持了一个很认真的姿势。等小鸟飞走，它才想起来眨眼。" }
+      ],
+      "responses": [
+        { "id": "look_together", "label": "和它一起看看", "reactionText": "它给你让出了一小块窗边的位置。", "memoryTags": ["watched_bird_together"] },
+        { "id": "praise_patience", "label": "夸它观察得仔细", "reactionText": "它的尾巴轻轻碰了一下地面。", "memoryTags": ["user_encourages_curiosity"] },
+        { "id": "do_not_disturb", "label": "先不打扰它", "reactionText": "它继续守着空空的窗沿。", "memoryTags": ["user_respects_focus"] }
+      ]
+    },
+    {
+      "id": "hidden_toy_01",
+      "category": "ordinary",
+      "timeWindows": ["daytime", "evening"],
+      "baseWeight": 10,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": ["hidden_toy_01", "hidden_toy_02"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": -1, "social": 0, "curiosity": 1 },
+      "memoryOutputTags": ["toy_hidden"],
+      "followUpEventIDs": ["hidden_toy_02"],
+      "sceneID": "home",
+      "visualTraceID": "toy_tail_under_cushion",
+      "emotion": "happy",
+      "textVariants": [
+        { "id": "a", "text": "栗子把玩具塞进垫子下面，只留下一小截尾巴。它对这个藏法似乎很满意。" }
+      ],
+      "responses": [
+        { "id": "pretend_not_seen", "label": "假装没有看见", "reactionText": "它又检查了一次，放心地走开了。", "memoryTags": ["user_keeps_secret"] },
+        { "id": "point_at_toy", "label": "指指露出的玩具", "reactionText": "它看了看玩具，又看了看你，决定把它再推进去一点。", "memoryTags": ["user_spotted_hiding_place"] },
+        { "id": "quiet_company", "label": "安静陪它一会儿", "reactionText": "它趴在自己的秘密旁边休息。", "memoryTags": ["shared_quiet"] }
+      ]
+    },
+    {
+      "id": "sun_patch",
+      "category": "ordinary",
+      "timeWindows": ["morning", "daytime"],
+      "baseWeight": 9,
+      "preferredTraits": [],
+      "excludedRecentEventIDs": ["sun_patch"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": -1, "social": 0, "curiosity": 0 },
+      "memoryOutputTags": ["found_sun_patch"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "warm_spot_on_rug",
+      "emotion": "calm",
+      "textVariants": [
+        { "id": "a", "text": "阳光慢慢爬过地毯，栗子也跟着挪了两次，最后把下巴放进最暖的那一小块。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "hallway_steps",
+      "category": "ordinary",
+      "timeWindows": ["evening", "night"],
+      "baseWeight": 9,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": ["hallway_steps"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 0, "energy": 1, "social": 0, "curiosity": 1 },
+      "memoryOutputTags": ["heard_hallway_steps"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "ears_toward_door",
+      "emotion": "calm",
+      "textVariants": [
+        { "id": "a", "text": "楼道里传来一串脚步声。栗子没有叫，只把两只耳朵依次转向门口。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "straighten_blanket_01",
+      "category": "ordinary",
+      "timeWindows": ["morning", "daytime", "evening"],
+      "baseWeight": 12,
+      "preferredTraits": ["tidy"],
+      "excludedRecentEventIDs": ["straighten_blanket_01", "straighten_blanket_02"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": -1, "social": 0, "curiosity": 0 },
+      "memoryOutputTags": ["blanket_rearranged"],
+      "followUpEventIDs": ["straighten_blanket_02"],
+      "sceneID": "home",
+      "visualTraceID": "blanket_new_fold",
+      "emotion": "happy",
+      "textVariants": [
+        { "id": "a", "text": "小毯子的一角卷了起来。栗子用鼻子推了几次，最后整理出了一个和原来不太一样的新形状。" }
+      ],
+      "responses": [
+        { "id": "keep_new_shape", "label": "保留它的新摆法", "reactionText": "它立刻在新折角旁边趴了下来。", "memoryTags": ["user_accepts_dogs_choice"] },
+        { "id": "help_straighten", "label": "和它一起整理", "reactionText": "它退后半步看着你，最后又把一个角推了回去。", "memoryTags": ["tidied_together"] },
+        { "id": "quiet_company", "label": "安静陪它一会儿", "reactionText": "它靠着还没完全铺平的毯子闭上了眼睛。", "memoryTags": ["shared_quiet"] }
+      ]
+    },
+    {
+      "id": "paper_bag",
+      "category": "ordinary",
+      "timeWindows": ["daytime", "evening"],
+      "baseWeight": 8,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": ["paper_bag"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": 1, "social": 0, "curiosity": 2 },
+      "memoryOutputTags": ["investigated_paper_bag"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "paper_bag_crumpled",
+      "emotion": "excited",
+      "textVariants": [
+        { "id": "a", "text": "纸袋自己响了一声——至少栗子看起来是这么认为的。它绕着纸袋走了整整一圈。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "water_reflection",
+      "category": "ordinary",
+      "timeWindows": ["morning", "daytime"],
+      "baseWeight": 7,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": ["water_reflection"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 0, "energy": 0, "social": 0, "curiosity": 1 },
+      "memoryOutputTags": ["noticed_reflection"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "small_water_ripple",
+      "emotion": "calm",
+      "textVariants": [
+        { "id": "a", "text": "水面晃了一下，碗里出现另一只栗子。它歪了歪头，那只栗子也这么做了。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "better_sleep_spot",
+      "category": "ordinary",
+      "timeWindows": ["evening", "night"],
+      "baseWeight": 10,
+      "preferredTraits": [],
+      "excludedRecentEventIDs": ["better_sleep_spot"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": -2, "social": 0, "curiosity": 0 },
+      "memoryOutputTags": ["chose_sleep_spot"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "pillow_dented",
+      "emotion": "calm",
+      "textVariants": [
+        { "id": "a", "text": "栗子先睡在垫子上，后来觉得不够好，又换到了靠近窗帘的阴影里。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "push_small_object",
+      "category": "ordinary",
+      "timeWindows": ["daytime", "evening"],
+      "baseWeight": 11,
+      "preferredTraits": ["tidy"],
+      "excludedRecentEventIDs": ["push_small_object"],
+      "requiredMemoryTags": [],
+      "stateEffects": { "mood": 1, "energy": 0, "social": 0, "curiosity": 1 },
+      "memoryOutputTags": ["object_moved_to_wall"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "small_object_by_wall",
+      "emotion": "happy",
+      "textVariants": [
+        { "id": "a", "text": "一个小东西落在路中间。栗子用爪子把它推到墙边，来回经过两次后，似乎对结果很满意。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "window_bird_02",
+      "category": "followUp",
+      "timeWindows": ["morning", "daytime"],
+      "baseWeight": 18,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": ["window_bird_02"],
+      "requiredMemoryTags": ["noticed_bird"],
+      "stateEffects": { "mood": 1, "energy": 0, "social": 1, "curiosity": 1 },
+      "memoryOutputTags": ["bird_returned"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "feather_near_window",
+      "emotion": "happy",
+      "textVariants": [
+        { "id": "a", "text": "栗子今天又去了窗边。小鸟没有停很久，但窗缝旁多出了一根很轻的羽毛。" },
+        { "id": "shared", "text": "栗子在你们一起看过的窗边等了一会儿。小鸟来过，还留下了一根羽毛。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "hidden_toy_02",
+      "category": "followUp",
+      "timeWindows": ["daytime", "evening"],
+      "baseWeight": 18,
+      "preferredTraits": ["curious"],
+      "excludedRecentEventIDs": ["hidden_toy_02"],
+      "requiredMemoryTags": ["toy_hidden"],
+      "stateEffects": { "mood": 1, "energy": 1, "social": 1, "curiosity": 0 },
+      "memoryOutputTags": ["toy_revealed"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "toy_returned_to_rug",
+      "emotion": "happy",
+      "textVariants": [
+        { "id": "secret", "text": "栗子把昨天藏好的玩具叼了出来，放在离你不远的地方。它没有解释这是不是邀请。" },
+        { "id": "spotted", "text": "栗子换了一个更难猜的地方，过了一会儿却又亲自把玩具叼回来了。" }
+      ],
+      "responses": []
+    },
+    {
+      "id": "straighten_blanket_02",
+      "category": "followUp",
+      "timeWindows": ["evening", "night"],
+      "baseWeight": 18,
+      "preferredTraits": ["tidy"],
+      "excludedRecentEventIDs": ["straighten_blanket_02"],
+      "requiredMemoryTags": ["blanket_rearranged"],
+      "stateEffects": { "mood": 1, "energy": -1, "social": 1, "curiosity": 0 },
+      "memoryOutputTags": ["blanket_spot_chosen"],
+      "followUpEventIDs": [],
+      "sceneID": "home",
+      "visualTraceID": "dog_resting_on_new_fold",
+      "emotion": "calm",
+      "textVariants": [
+        { "id": "kept", "text": "栗子又回到了自己整理出的折角旁。事实证明，它昨天的新摆法确实很舒服。" },
+        { "id": "together", "text": "栗子在你们一起整理过的毯子上转了一圈，最后把下巴放在了你铺平的位置。" }
+      ],
+      "responses": []
+    }
+  ]
+}

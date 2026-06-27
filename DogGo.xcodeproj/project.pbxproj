@@ -14,6 +14,14 @@
 		A00000000000000000000106 /* DogGoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000006; };
 		A00000000000000000000107 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000007; };
 		A00000000000000000000108 /* DogProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000008; };
+		A00000000000000000000109 /* DogState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000011; };
+		A00000000000000000000110 /* LifeEventRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000012; };
+		A00000000000000000000111 /* MemoryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000013; };
+		A00000000000000000000112 /* Relationship.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000014; };
+		A00000000000000000000113 /* EventDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000015; };
+		A00000000000000000000114 /* EventCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000016; };
+		A00000000000000000000115 /* m0-events.json in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000017; };
+		A00000000000000000000116 /* EventCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000018; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +45,14 @@
 		A00000000000000000000008 /* DogProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogProfileTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000009 /* DogGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DogGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A00000000000000000000010 /* DogGoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DogGoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000011 /* DogState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogState.swift; sourceTree = "<group>"; };
+		A00000000000000000000012 /* LifeEventRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeEventRecord.swift; sourceTree = "<group>"; };
+		A00000000000000000000013 /* MemoryRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryRecord.swift; sourceTree = "<group>"; };
+		A00000000000000000000014 /* Relationship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Relationship.swift; sourceTree = "<group>"; };
+		A00000000000000000000015 /* EventDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDefinition.swift; sourceTree = "<group>"; };
+		A00000000000000000000016 /* EventCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCatalog.swift; sourceTree = "<group>"; };
+		A00000000000000000000017 /* m0-events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Resources/EventContent/m0-events.json; sourceTree = "<group>"; };
+		A00000000000000000000018 /* EventCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCatalogTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,8 +77,10 @@
 				A00000000000000000000603 /* App */,
 				A00000000000000000000604 /* Features */,
 				A00000000000000000000607 /* Domain */,
+				A00000000000000000000613 /* Data */,
 				A00000000000000000000608 /* DesignSystem */,
 				A00000000000000000000007 /* Assets.xcassets */,
+				A00000000000000000000017 /* m0-events.json */,
 			);
 			path = DogGo;
 			sourceTree = "<group>";
@@ -71,10 +89,14 @@
 		A00000000000000000000604 /* Features */ = {isa = PBXGroup; children = (A00000000000000000000605 /* Adoption */, A00000000000000000000606 /* Home */,); path = Features; sourceTree = "<group>"; };
 		A00000000000000000000605 /* Adoption */ = {isa = PBXGroup; children = (A00000000000000000000003 /* ProductPromiseView.swift */,); path = Adoption; sourceTree = "<group>"; };
 		A00000000000000000000606 /* Home */ = {isa = PBXGroup; children = (A00000000000000000000004 /* HomeFoundationView.swift */,); path = Home; sourceTree = "<group>"; };
-		A00000000000000000000607 /* Domain */ = {isa = PBXGroup; children = (A00000000000000000000005 /* DogProfile.swift */,); path = Domain/Models; sourceTree = "<group>"; };
+		A00000000000000000000607 /* Domain */ = {isa = PBXGroup; children = (A00000000000000000000611 /* Models */, A00000000000000000000612 /* LifeEngine */,); path = Domain; sourceTree = "<group>"; };
 		A00000000000000000000608 /* DesignSystem */ = {isa = PBXGroup; children = (A00000000000000000000006 /* DogGoTheme.swift */,); path = DesignSystem; sourceTree = "<group>"; };
-		A00000000000000000000609 /* DogGoTests */ = {isa = PBXGroup; children = (A00000000000000000000008 /* DogProfileTests.swift */,); path = DogGoTests; sourceTree = "<group>"; };
+		A00000000000000000000609 /* DogGoTests */ = {isa = PBXGroup; children = (A00000000000000000000008 /* DogProfileTests.swift */, A00000000000000000000018 /* EventCatalogTests.swift */,); path = DogGoTests; sourceTree = "<group>"; };
 		A00000000000000000000610 /* Products */ = {isa = PBXGroup; children = (A00000000000000000000009 /* DogGo.app */, A00000000000000000000010 /* DogGoTests.xctest */,); name = Products; sourceTree = "<group>"; };
+		A00000000000000000000611 /* Models */ = {isa = PBXGroup; children = (A00000000000000000000005 /* DogProfile.swift */, A00000000000000000000011 /* DogState.swift */, A00000000000000000000012 /* LifeEventRecord.swift */, A00000000000000000000013 /* MemoryRecord.swift */, A00000000000000000000014 /* Relationship.swift */,); path = Models; sourceTree = "<group>"; };
+		A00000000000000000000612 /* LifeEngine */ = {isa = PBXGroup; children = (A00000000000000000000015 /* EventDefinition.swift */,); path = LifeEngine; sourceTree = "<group>"; };
+		A00000000000000000000613 /* Data */ = {isa = PBXGroup; children = (A00000000000000000000614 /* EventCatalog */,); path = Data; sourceTree = "<group>"; };
+		A00000000000000000000614 /* EventCatalog */ = {isa = PBXGroup; children = (A00000000000000000000016 /* EventCatalog.swift */,); path = EventCatalog; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -127,13 +149,13 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A00000000000000000000901 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000107 /* Assets.xcassets in Resources */,); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000901 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000107 /* Assets.xcassets in Resources */, A00000000000000000000115 /* m0-events.json in Resources */,); runOnlyForDeploymentPostprocessing = 0; };
 		A00000000000000000000902 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A00000000000000000000801 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000101, A00000000000000000000102, A00000000000000000000103, A00000000000000000000104, A00000000000000000000105, A00000000000000000000106,); runOnlyForDeploymentPostprocessing = 0; };
-		A00000000000000000000802 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000108,); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000801 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000101, A00000000000000000000102, A00000000000000000000103, A00000000000000000000104, A00000000000000000000105, A00000000000000000000106, A00000000000000000000109, A00000000000000000000110, A00000000000000000000111, A00000000000000000000112, A00000000000000000000113, A00000000000000000000114,); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000802 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000108, A00000000000000000000116,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */

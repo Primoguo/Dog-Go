@@ -7,6 +7,12 @@ struct DogGoApp: App {
         WindowGroup {
             RootView()
         }
-        .modelContainer(for: DogProfile.self)
+        .modelContainer(for: [
+            DogProfile.self,
+            DogState.self,
+            LifeEventRecord.self,
+            MemoryRecord.self,
+            Relationship.self
+        ])
     }
 }
