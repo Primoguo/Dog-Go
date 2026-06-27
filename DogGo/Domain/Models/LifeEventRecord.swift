@@ -4,6 +4,7 @@ import SwiftData
 @Model
 final class LifeEventRecord {
     var id: UUID
+    var dogID: UUID
     var definitionID: String
     var occurredAt: Date
     var sceneID: String
@@ -16,6 +17,7 @@ final class LifeEventRecord {
 
     init(
         id: UUID = UUID(),
+        dogID: UUID,
         definitionID: String,
         occurredAt: Date,
         sceneID: String,
@@ -27,6 +29,7 @@ final class LifeEventRecord {
         idempotencyKey: String
     ) {
         self.id = id
+        self.dogID = dogID
         self.definitionID = definitionID
         self.occurredAt = occurredAt
         self.sceneID = sceneID

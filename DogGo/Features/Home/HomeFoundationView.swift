@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct HomeFoundationView: View {
+    let dogName: String
+
     var body: some View {
         ZStack {
             DogGoTheme.Colors.canvas.ignoresSafeArea()
@@ -11,7 +13,7 @@ struct HomeFoundationView: View {
                     .foregroundStyle(DogGoTheme.Colors.ochre)
                     .accessibilityHidden(true)
 
-                Text("栗子正在观察窗外")
+                Text("\(dogName)正在观察窗外")
                     .font(DogGoTheme.Typography.headline)
                     .foregroundStyle(DogGoTheme.Colors.ink)
 
@@ -25,5 +27,5 @@ struct HomeFoundationView: View {
 }
 
 #Preview {
-    HomeFoundationView()
+    HomeFoundationView(dogName: "栗子")
 }

@@ -4,6 +4,7 @@ import SwiftData
 @Model
 final class MemoryRecord {
     var id: UUID
+    var dogID: UUID
     var createdAt: Date
     var sourceEventID: UUID
     var responseID: String?
@@ -12,6 +13,7 @@ final class MemoryRecord {
 
     init(
         id: UUID = UUID(),
+        dogID: UUID,
         createdAt: Date = .now,
         sourceEventID: UUID,
         responseID: String? = nil,
@@ -19,6 +21,7 @@ final class MemoryRecord {
         referencedByEventIDs: [UUID] = []
     ) {
         self.id = id
+        self.dogID = dogID
         self.createdAt = createdAt
         self.sourceEventID = sourceEventID
         self.responseID = responseID

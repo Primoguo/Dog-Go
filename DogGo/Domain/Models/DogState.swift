@@ -35,6 +35,7 @@ enum DogBehavior: String, Codable, CaseIterable {
 @Model
 final class DogState {
     var id: UUID
+    var dogID: UUID
     var moodRawValue: String
     var energyRawValue: String
     var socialTendencyRawValue: String
@@ -44,6 +45,7 @@ final class DogState {
 
     init(
         id: UUID = UUID(),
+        dogID: UUID,
         mood: DogMood = .calm,
         energy: DogEnergy = .normal,
         socialTendency: SocialTendency = .neutral,
@@ -52,6 +54,7 @@ final class DogState {
         lastSimulatedAt: Date = .now
     ) {
         self.id = id
+        self.dogID = dogID
         self.moodRawValue = mood.rawValue
         self.energyRawValue = energy.rawValue
         self.socialTendencyRawValue = socialTendency.rawValue
