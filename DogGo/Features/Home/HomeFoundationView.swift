@@ -12,6 +12,7 @@ struct HomeFoundationView: View {
     @State private var showingMoments = false
     @State private var loadError: String?
     @State private var showingQuietCompany = false
+    @State private var showingOurDays = false
 
     init(dog: DogProfile) {
         self.dog = dog
@@ -28,6 +29,20 @@ struct HomeFoundationView: View {
             DogGoTheme.Colors.canvas.ignoresSafeArea()
 
             VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button { showingOurDays = true } label: {
+                        Label("我们的日子", systemImage: "book.closed")
+                            .font(DogGoTheme.Typography.caption)
+                            .foregroundStyle(DogGoTheme.Colors.olive)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 9)
+                            .background(DogGoTheme.Colors.ink.opacity(0.05))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+
                 Spacer(minLength: 36)
 
                 Text("\(dog.name)正在\(currentBehavior.title)")
@@ -100,6 +115,10 @@ struct HomeFoundationView: View {
         .sheet(isPresented: $showingQuietCompany) {
             QuietCompanionView(dogName: dog.name)
                 .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $showingOurDays) {
+            OurDaysView(dogID: dog.id, dogName: dog.name)
+                .presentationDetents([.large])
         }
     }
 

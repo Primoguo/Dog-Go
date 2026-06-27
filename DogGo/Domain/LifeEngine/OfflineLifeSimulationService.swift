@@ -84,15 +84,23 @@ struct OfflineLifeSimulationService {
                     continue
                 }
 
+                let eventID = UUID()
+                let referencedMemoryTags = MemoryReferenceLinker().link(
+                    eventID: eventID,
+                    requiredTags: definition.requiredMemoryTags,
+                    memories: memories
+                )
                 let snapshot = LifeEventFactSnapshot(
                     definitionID: definition.id,
                     textVariantID: text.id,
                     text: text.text,
                     sceneID: definition.sceneID,
                     emotion: definition.emotion,
-                    visualTraceID: definition.visualTraceID
+                    visualTraceID: definition.visualTraceID,
+                    referencedMemoryTags: referencedMemoryTags.isEmpty ? nil : referencedMemoryTags
                 )
                 let record = LifeEventRecord(
+                    id: eventID,
                     dogID: dog.id,
                     definitionID: definition.id,
                     occurredAt: occurredAt,

@@ -36,4 +36,11 @@ final class MemoryRecord {
     var referencedByEventIDs: [UUID] {
         (try? JSONDecoder().decode([UUID].self, from: referencedByEventIDsData)) ?? []
     }
+
+    func addReference(from eventID: UUID) {
+        var eventIDs = referencedByEventIDs
+        guard !eventIDs.contains(eventID) else { return }
+        eventIDs.append(eventID)
+        referencedByEventIDsData = (try? JSONEncoder().encode(eventIDs)) ?? Data()
+    }
 }

@@ -58,6 +58,23 @@ struct LifeMomentView: View {
                         .padding(.top, 22)
                         .fixedSize(horizontal: false, vertical: true)
 
+                        if let memoryTags = event.factSnapshot?.referencedMemoryTags,
+                           !memoryTags.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("它记得你们之间的事", systemImage: "bookmark.fill")
+                                    .font(DogGoTheme.Typography.caption)
+                                    .foregroundStyle(DogGoTheme.Colors.olive)
+                                Text(memoryTags.map(\.memoryDisplayName).joined(separator: " · "))
+                                    .font(DogGoTheme.Typography.body)
+                                    .foregroundStyle(DogGoTheme.Colors.ink)
+                            }
+                            .padding(18)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(DogGoTheme.Colors.olive.opacity(0.09))
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .padding(.top, 24)
+                        }
+
                         if let displayedReactionText {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("你的回应留下了影响")
@@ -136,6 +153,18 @@ struct LifeMomentView: View {
                 errorMessage = "回应暂时没有保存，请再试一次。"
             }
             isSavingResponse = false
+        }
+    }
+}
+
+extension String {
+    var memoryDisplayName: String {
+        switch self {
+        case "first_meeting": "第一次见面"
+        case "gentle_response": "温柔的回应"
+        case "playful_response": "一起玩过的约定"
+        case "quiet_response": "安静陪伴的时刻"
+        default: replacingOccurrences(of: "_", with: " ")
         }
     }
 }
