@@ -30,6 +30,10 @@
 		A00000000000000000000122 /* AdoptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000024; };
 		A00000000000000000000123 /* AdoptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000025; };
 		A00000000000000000000124 /* AdoptionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000026; };
+		A00000000000000000000125 /* LifeEventFactSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000027; };
+		A00000000000000000000126 /* FirstExperienceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000028; };
+		A00000000000000000000127 /* LifeMomentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000029; };
+		A00000000000000000000128 /* FirstExperienceServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000030; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +73,10 @@
 		A00000000000000000000024 /* AdoptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoptionService.swift; sourceTree = "<group>"; };
 		A00000000000000000000025 /* AdoptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoptionView.swift; sourceTree = "<group>"; };
 		A00000000000000000000026 /* AdoptionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoptionServiceTests.swift; sourceTree = "<group>"; };
+		A00000000000000000000027 /* LifeEventFactSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeEventFactSnapshot.swift; sourceTree = "<group>"; };
+		A00000000000000000000028 /* FirstExperienceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstExperienceService.swift; sourceTree = "<group>"; };
+		A00000000000000000000029 /* LifeMomentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeMomentView.swift; sourceTree = "<group>"; };
+		A00000000000000000000030 /* FirstExperienceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstExperienceServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,18 +110,19 @@
 			sourceTree = "<group>";
 		};
 		A00000000000000000000603 /* App */ = {isa = PBXGroup; children = (A00000000000000000000002 /* RootView.swift */,); path = App; sourceTree = "<group>"; };
-		A00000000000000000000604 /* Features */ = {isa = PBXGroup; children = (A00000000000000000000605 /* Adoption */, A00000000000000000000606 /* Home */,); path = Features; sourceTree = "<group>"; };
+		A00000000000000000000604 /* Features */ = {isa = PBXGroup; children = (A00000000000000000000605 /* Adoption */, A00000000000000000000606 /* Home */, A00000000000000000000616 /* LifeMoments */,); path = Features; sourceTree = "<group>"; };
 		A00000000000000000000605 /* Adoption */ = {isa = PBXGroup; children = (A00000000000000000000003 /* ProductPromiseView.swift */, A00000000000000000000025 /* AdoptionView.swift */,); path = Adoption; sourceTree = "<group>"; };
 		A00000000000000000000606 /* Home */ = {isa = PBXGroup; children = (A00000000000000000000004 /* HomeFoundationView.swift */,); path = Home; sourceTree = "<group>"; };
 		A00000000000000000000607 /* Domain */ = {isa = PBXGroup; children = (A00000000000000000000611 /* Models */, A00000000000000000000612 /* LifeEngine */, A00000000000000000000615 /* Adoption */,); path = Domain; sourceTree = "<group>"; };
 		A00000000000000000000608 /* DesignSystem */ = {isa = PBXGroup; children = (A00000000000000000000006 /* DogGoTheme.swift */,); path = DesignSystem; sourceTree = "<group>"; };
-		A00000000000000000000609 /* DogGoTests */ = {isa = PBXGroup; children = (A00000000000000000000008 /* DogProfileTests.swift */, A00000000000000000000018 /* EventCatalogTests.swift */, A00000000000000000000022 /* LifeEventSelectorTests.swift */, A00000000000000000000026 /* AdoptionServiceTests.swift */,); path = DogGoTests; sourceTree = "<group>"; };
+		A00000000000000000000609 /* DogGoTests */ = {isa = PBXGroup; children = (A00000000000000000000008 /* DogProfileTests.swift */, A00000000000000000000018 /* EventCatalogTests.swift */, A00000000000000000000022 /* LifeEventSelectorTests.swift */, A00000000000000000000026 /* AdoptionServiceTests.swift */, A00000000000000000000030 /* FirstExperienceServiceTests.swift */,); path = DogGoTests; sourceTree = "<group>"; };
 		A00000000000000000000610 /* Products */ = {isa = PBXGroup; children = (A00000000000000000000009 /* DogGo.app */, A00000000000000000000010 /* DogGoTests.xctest */,); name = Products; sourceTree = "<group>"; };
 		A00000000000000000000611 /* Models */ = {isa = PBXGroup; children = (A00000000000000000000005 /* DogProfile.swift */, A00000000000000000000011 /* DogState.swift */, A00000000000000000000012 /* LifeEventRecord.swift */, A00000000000000000000013 /* MemoryRecord.swift */, A00000000000000000000014 /* Relationship.swift */,); path = Models; sourceTree = "<group>"; };
-		A00000000000000000000612 /* LifeEngine */ = {isa = PBXGroup; children = (A00000000000000000000015 /* EventDefinition.swift */, A00000000000000000000019 /* Clock.swift */, A00000000000000000000020 /* SeededRandomSource.swift */, A00000000000000000000021 /* EventSelection.swift */,); path = LifeEngine; sourceTree = "<group>"; };
+		A00000000000000000000612 /* LifeEngine */ = {isa = PBXGroup; children = (A00000000000000000000015 /* EventDefinition.swift */, A00000000000000000000019 /* Clock.swift */, A00000000000000000000020 /* SeededRandomSource.swift */, A00000000000000000000021 /* EventSelection.swift */, A00000000000000000000027 /* LifeEventFactSnapshot.swift */, A00000000000000000000028 /* FirstExperienceService.swift */,); path = LifeEngine; sourceTree = "<group>"; };
 		A00000000000000000000613 /* Data */ = {isa = PBXGroup; children = (A00000000000000000000614 /* EventCatalog */,); path = Data; sourceTree = "<group>"; };
 		A00000000000000000000614 /* EventCatalog */ = {isa = PBXGroup; children = (A00000000000000000000016 /* EventCatalog.swift */,); path = EventCatalog; sourceTree = "<group>"; };
 		A00000000000000000000615 /* Adoption */ = {isa = PBXGroup; children = (A00000000000000000000023 /* DogNameValidator.swift */, A00000000000000000000024 /* AdoptionService.swift */,); path = Adoption; sourceTree = "<group>"; };
+		A00000000000000000000616 /* LifeMoments */ = {isa = PBXGroup; children = (A00000000000000000000029 /* LifeMomentView.swift */,); path = LifeMoments; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -171,8 +180,8 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A00000000000000000000801 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000101, A00000000000000000000102, A00000000000000000000103, A00000000000000000000104, A00000000000000000000105, A00000000000000000000106, A00000000000000000000109, A00000000000000000000110, A00000000000000000000111, A00000000000000000000112, A00000000000000000000113, A00000000000000000000114, A00000000000000000000117, A00000000000000000000118, A00000000000000000000119, A00000000000000000000121, A00000000000000000000122, A00000000000000000000123,); runOnlyForDeploymentPostprocessing = 0; };
-		A00000000000000000000802 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000108, A00000000000000000000116, A00000000000000000000120, A00000000000000000000124,); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000801 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000101, A00000000000000000000102, A00000000000000000000103, A00000000000000000000104, A00000000000000000000105, A00000000000000000000106, A00000000000000000000109, A00000000000000000000110, A00000000000000000000111, A00000000000000000000112, A00000000000000000000113, A00000000000000000000114, A00000000000000000000117, A00000000000000000000118, A00000000000000000000119, A00000000000000000000121, A00000000000000000000122, A00000000000000000000123, A00000000000000000000125, A00000000000000000000126, A00000000000000000000127,); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000802 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000108, A00000000000000000000116, A00000000000000000000120, A00000000000000000000124, A00000000000000000000128,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */

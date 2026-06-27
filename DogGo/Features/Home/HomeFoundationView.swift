@@ -1,31 +1,167 @@
+import SwiftData
 import SwiftUI
 
 struct HomeFoundationView: View {
-    let dogName: String
+    @Environment(\.modelContext) private var modelContext
+    @Query private var states: [DogState]
+    @Query(sort: \LifeEventRecord.occurredAt, order: .reverse) private var events: [LifeEventRecord]
+
+    let dog: DogProfile
+
+    @State private var selectedEvent: LifeEventRecord?
+    @State private var loadError: String?
+    @State private var showingQuietCompany = false
+
+    init(dog: DogProfile) {
+        self.dog = dog
+        let dogID = dog.id
+        _states = Query(filter: #Predicate<DogState> { $0.dogID == dogID })
+        _events = Query(filter: #Predicate<LifeEventRecord> { $0.dogID == dogID }, sort: \LifeEventRecord.occurredAt, order: .reverse)
+    }
+
+    private var unreadEvents: [LifeEventRecord] { events.filter { !$0.isViewed } }
+    private var currentBehavior: DogBehavior { states.first?.currentBehavior ?? .observing }
 
     var body: some View {
         ZStack {
             DogGoTheme.Colors.canvas.ignoresSafeArea()
 
-            VStack(spacing: DogGoTheme.Spacing.medium) {
-                Image(systemName: "sun.max.fill")
-                    .font(.system(size: 28, weight: .light))
-                    .foregroundStyle(DogGoTheme.Colors.ochre)
-                    .accessibilityHidden(true)
+            VStack(spacing: 0) {
+                Spacer(minLength: 36)
 
-                Text("\(dogName)正在观察窗外")
+                Text("\(dog.name)正在\(currentBehavior.title)")
                     .font(DogGoTheme.Typography.headline)
                     .foregroundStyle(DogGoTheme.Colors.ink)
+
+                Image(systemName: currentBehavior.symbolName)
+                    .font(.system(size: 92, weight: .ultraLight))
+                    .foregroundStyle(DogGoTheme.Colors.ochre)
+                    .frame(height: 230)
+                    .accessibilityLabel("\(dog.name)正在\(currentBehavior.title)")
 
                 Text("阳光落在它的耳朵上，窗帘轻轻动了一下。")
                     .font(DogGoTheme.Typography.caption)
                     .foregroundStyle(DogGoTheme.Colors.secondaryInk)
+
+                Spacer()
+
+                if let loadError {
+                    Text(loadError)
+                        .font(DogGoTheme.Typography.caption)
+                        .foregroundStyle(.red.opacity(0.75))
+                        .padding(.bottom, 12)
+                }
+
+                Button {
+                    selectedEvent = unreadEvents.first ?? events.first
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("你不在时 · \(unreadEvents.count) 个片段")
+                                .font(DogGoTheme.Typography.body)
+                            Text(unreadEvents.isEmpty ? "今天的片段都看过了" : "看看它刚刚经历了什么")
+                                .font(DogGoTheme.Typography.caption)
+                                .opacity(0.72)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                    .foregroundStyle(DogGoTheme.Colors.ink)
+                    .padding(18)
+                    .background(DogGoTheme.Colors.ink.opacity(0.06))
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(events.isEmpty)
+
+                Button("一起待会儿") { showingQuietCompany = true }
+                    .font(DogGoTheme.Typography.button)
+                    .foregroundStyle(DogGoTheme.Colors.canvas)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 17)
+                    .background(DogGoTheme.Colors.olive)
+                    .clipShape(Capsule())
+                    .padding(.top, 14)
+                    .accessibilityHint("进入安静陪伴")
             }
-            .padding(DogGoTheme.Spacing.page)
+            .padding(.horizontal, DogGoTheme.Spacing.page)
+            .padding(.bottom, 32)
+        }
+        .task { await prepareFirstExperience() }
+        .sheet(item: $selectedEvent) { event in
+            LifeMomentView(event: event, dogName: dog.name)
+                .presentationDetents([.large])
+        }
+        .sheet(isPresented: $showingQuietCompany) {
+            QuietCompanionView(dogName: dog.name)
+                .presentationDetents([.medium])
+        }
+    }
+
+    @MainActor
+    private func prepareFirstExperience() async {
+        do {
+            _ = try FirstExperienceService().ensureFirstMeeting(for: dog, in: modelContext)
+        } catch {
+            loadError = "暂时没能准备好今天的片段。"
         }
     }
 }
 
-#Preview {
-    HomeFoundationView(dogName: "栗子")
+private struct QuietCompanionView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var breathing = false
+
+    let dogName: String
+
+    var body: some View {
+        ZStack {
+            DogGoTheme.Colors.canvas.ignoresSafeArea()
+            VStack(spacing: 22) {
+                Image(systemName: "dog.fill")
+                    .font(.system(size: 68, weight: .ultraLight))
+                    .foregroundStyle(DogGoTheme.Colors.ochre)
+                    .scaleEffect(reduceMotion ? 1 : (breathing ? 1.025 : 0.99), anchor: .bottom)
+                    .animation(
+                        reduceMotion ? nil : .easeInOut(duration: 2.8).repeatForever(autoreverses: true),
+                        value: breathing
+                    )
+                    .accessibilityHidden(true)
+
+                Text("和\(dogName)一起待会儿")
+                    .font(DogGoTheme.Typography.headline)
+                    .foregroundStyle(DogGoTheme.Colors.ink)
+
+                Text("什么都不用做。听一会儿房间里的声音就好。")
+                    .font(DogGoTheme.Typography.caption)
+                    .foregroundStyle(DogGoTheme.Colors.secondaryInk)
+                    .multilineTextAlignment(.center)
+
+                Button("结束陪伴") { dismiss() }
+                    .font(DogGoTheme.Typography.button)
+                    .foregroundStyle(DogGoTheme.Colors.olive)
+            }
+            .padding(DogGoTheme.Spacing.page)
+        }
+        .onAppear { breathing = true }
+    }
+}
+
+private extension DogBehavior {
+    var title: String {
+        switch self {
+        case .sleeping: "睡觉"
+        case .observing: "观察窗外"
+        case .playing: "玩自己的玩具"
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .sleeping: "dog.fill"
+        case .observing: "dog.fill"
+        case .playing: "tennisball.fill"
+        }
+    }
 }

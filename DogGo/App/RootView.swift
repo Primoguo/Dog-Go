@@ -14,7 +14,7 @@ struct RootView: View {
                     }
                 }
             } else if let dog = dogs.first {
-                HomeFoundationView(dogName: dog.name)
+                HomeFoundationView(dog: dog)
             } else {
                 AdoptionView()
             }
