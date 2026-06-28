@@ -56,7 +56,7 @@ struct OurDaysView: View {
         return NavigationLink {
             LifeMomentView(event: event, dogName: dogName)
         } label: {
-            HStack(alignment: .top, spacing: 15) {
+            HStack(alignment: .top, spacing: 14) {
                 VStack(spacing: 0) {
                     Circle()
                         .fill(event.selectedResponseID == nil ? DogGoTheme.Colors.ochre : DogGoTheme.Colors.olive)
@@ -64,25 +64,38 @@ struct OurDaysView: View {
                     if !isLast {
                         Rectangle()
                             .fill(DogGoTheme.Colors.olive.opacity(0.22))
-                            .frame(width: 1, height: 102)
+                            .frame(width: 1, height: 228)
                     }
                 }
 
-                VStack(alignment: .leading, spacing: 7) {
-                    Text(event.occurredAt.formatted(date: .abbreviated, time: .omitted))
-                        .font(DogGoTheme.Typography.caption)
-                        .foregroundStyle(DogGoTheme.Colors.olive)
+                VStack(alignment: .leading, spacing: 8) {
+                    EventVisualThumbnail(event: event, dogName: dogName)
+                        .frame(height: 118)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+                    HStack {
+                        Text(event.occurredAt.formatted(date: .abbreviated, time: .omitted))
+                            .font(DogGoTheme.Typography.caption)
+                            .foregroundStyle(DogGoTheme.Colors.olive)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(DogGoTheme.Colors.secondaryInk)
+                    }
                     Text(event.factSnapshot?.text ?? "\(dogName)度过了一小段自己的时间。")
                         .font(DogGoTheme.Typography.body)
                         .foregroundStyle(DogGoTheme.Colors.ink)
+                        .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                    if event.definitionID == "first_meeting" {
-                        milestone("第一次见面")
-                    } else if event.definitionID == "first_short_leave" {
-                        milestone("第一次短暂分别")
-                    }
-                    if event.selectedResponseID != nil {
-                        milestone("你回应了它")
+                    HStack(spacing: 8) {
+                        if event.definitionID == "first_meeting" {
+                            milestone("第一次见面")
+                        } else if event.definitionID == "first_short_leave" {
+                            milestone("第一次短暂分别")
+                        }
+                        if event.selectedResponseID != nil {
+                            milestone("你回应了它")
+                        }
                     }
                     if let memory, !memory.referencedByEventIDs.isEmpty {
                         Text("后来被想起 \(memory.referencedByEventIDs.count) 次")
@@ -92,9 +105,6 @@ struct OurDaysView: View {
                 }
                 .padding(.bottom, isLast ? 0 : 22)
                 Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(DogGoTheme.Colors.secondaryInk)
             }
             .contentShape(Rectangle())
         }

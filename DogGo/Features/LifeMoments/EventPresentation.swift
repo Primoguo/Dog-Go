@@ -1,6 +1,15 @@
-import Foundation
+import SwiftUI
 
 extension LifeEventRecord {
+    var visualPose: DogVisualPose {
+        switch definitionID {
+        case "first_short_leave", "hallway_steps": .standTurn
+        case "hidden_toy_01", "paper_bag", "toy_returned_to_rug": .playBow
+        case "sun_patch", "better_sleep_spot", "straighten_blanket_01": .lieRest
+        default: .sitWindow
+        }
+    }
+
     var emotionTitle: String {
         switch emotion {
         case "happy": "心情很好"
@@ -38,5 +47,45 @@ extension LifeEventRecord {
         case "dog_resting_on_new_fold": "它正靠着昨天整理的折角"
         default: "房间里留下了一点生活过的痕迹"
         }
+    }
+}
+
+struct EventVisualThumbnail: View {
+    let event: LifeEventRecord
+    let dogName: String
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                Image("SceneHomeBase")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+
+                if let trace = HomeSceneTrace.resolve(visualTraceID: event.visualTraceID) {
+                    Image(trace.assetName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: proxy.size.width * min(trace.width * 1.5, 0.32))
+                        .position(x: proxy.size.width * trace.x, y: proxy.size.height * trace.y)
+                }
+
+                DogAnimationPlayerView(
+                    pose: event.visualPose,
+                    accessibilityLabel: "\(dogName)的生活片段画面"
+                )
+                .frame(width: proxy.size.width * 0.72, height: proxy.size.height * 0.82)
+                .position(x: proxy.size.width * 0.50, y: proxy.size.height * 0.58)
+
+                LinearGradient(
+                    colors: [.clear, DogGoTheme.Colors.ink.opacity(0.28)],
+                    startPoint: .center,
+                    endPoint: .bottom
+                )
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(dogName)的生活片段：\(event.emotionTitle)")
     }
 }
