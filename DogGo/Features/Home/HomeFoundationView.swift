@@ -4,6 +4,7 @@ import SwiftUI
 struct HomeFoundationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query private var states: [DogState]
     @Query(sort: \LifeEventRecord.occurredAt, order: .reverse) private var events: [LifeEventRecord]
 
@@ -13,6 +14,7 @@ struct HomeFoundationView: View {
     @State private var loadError: String?
     @State private var showingQuietCompany = false
     @State private var showingOurDays = false
+    @State private var presentation = HomeLifePresentationModel()
 #if DEBUG
     @State private var showingDebugPanel = false
 #endif
@@ -29,7 +31,7 @@ struct HomeFoundationView: View {
 
     var body: some View {
         ZStack {
-            DogGoTheme.Colors.canvas.ignoresSafeArea()
+            HomeSceneBackdrop(visualTraceID: events.first?.visualTraceID)
 
             VStack(spacing: 0) {
                 HStack {
@@ -38,8 +40,11 @@ struct HomeFoundationView: View {
                         Image(systemName: "wrench.and.screwdriver")
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
+                            .background(DogGoTheme.Colors.canvas.opacity(0.74))
+                            .clipShape(Circle())
                     }
                     .foregroundStyle(DogGoTheme.Colors.olive)
+                    .buttonStyle(.plain)
                     .accessibilityLabel("打开生活调试台")
 #endif
                     Spacer()
@@ -49,7 +54,7 @@ struct HomeFoundationView: View {
                             .foregroundStyle(DogGoTheme.Colors.olive)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 9)
-                            .background(DogGoTheme.Colors.ink.opacity(0.05))
+                            .background(DogGoTheme.Colors.canvas.opacity(0.74))
                             .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
@@ -61,15 +66,28 @@ struct HomeFoundationView: View {
                     .font(DogGoTheme.Typography.headline)
                     .foregroundStyle(DogGoTheme.Colors.ink)
 
-                Image(systemName: currentBehavior.symbolName)
-                    .font(.system(size: 92, weight: .ultraLight))
-                    .foregroundStyle(DogGoTheme.Colors.ochre)
-                    .frame(height: 230)
-                    .accessibilityLabel("\(dog.name)正在\(currentBehavior.title)")
+                TimelineView(.periodic(from: .now, by: 60)) { context in
+                    let phase = HomeTimePhase(date: context.date)
+                    DogAnimationPlayerView(
+                        pose: presentation.pose,
+                        cue: presentation.cue,
+                        cueToken: presentation.cueToken,
+                        accessibilityLabel: "\(dog.name)正在\(currentBehavior.title)"
+                    )
+                    .brightness(phase.dogBrightness)
+                    .saturation(phase.dogSaturation)
+                }
+                .frame(height: 230)
 
-                Text("阳光落在它的耳朵上，窗帘轻轻动了一下。")
+                TimelineView(.periodic(from: .now, by: 60)) { context in
+                    Text(HomeTimePhase(date: context.date).caption)
+                }
                     .font(DogGoTheme.Typography.caption)
                     .foregroundStyle(DogGoTheme.Colors.secondaryInk)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(DogGoTheme.Colors.canvas.opacity(0.72))
+                    .clipShape(Capsule())
 
                 Spacer()
 
@@ -102,7 +120,7 @@ struct HomeFoundationView: View {
                     }
                     .foregroundStyle(DogGoTheme.Colors.ink)
                     .padding(18)
-                    .background(DogGoTheme.Colors.ink.opacity(0.06))
+                    .background(DogGoTheme.Colors.canvas.opacity(0.78))
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 }
                 .buttonStyle(.plain)
@@ -121,7 +139,16 @@ struct HomeFoundationView: View {
             .padding(.horizontal, DogGoTheme.Spacing.page)
             .padding(.bottom, 32)
         }
-        .task { await refreshLife() }
+        .task {
+            await refreshLife()
+            presentation.start(behavior: currentBehavior, reduceMotion: reduceMotion)
+        }
+        .onChange(of: currentBehavior) { _, behavior in
+            presentation.update(behavior: behavior, reduceMotion: reduceMotion)
+        }
+        .onChange(of: reduceMotion) { _, value in
+            presentation.start(behavior: currentBehavior, reduceMotion: value)
+        }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
             Task { await refreshLife() }
@@ -144,6 +171,7 @@ struct HomeFoundationView: View {
                 .presentationDetents([.large])
         }
 #endif
+        .onDisappear { presentation.stop() }
     }
 
     @MainActor
@@ -160,6 +188,119 @@ struct HomeFoundationView: View {
             }
         } catch {
             loadError = "暂时没能准备好今天的片段。"
+        }
+    }
+}
+
+private struct HomeSceneBackdrop: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var curtainDrifting = false
+
+    let visualTraceID: String?
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            let phase = HomeTimePhase(date: context.date)
+            GeometryReader { proxy in
+                ZStack {
+                    Image("SceneHomeBase")
+                        .resizable()
+                        .scaledToFill()
+                        .brightness(phase.brightness)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .clipped()
+
+                    if phase.sunPatchOpacity > 0 {
+                        Image("SceneHomeSunPatch")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                            .opacity(phase.sunPatchOpacity)
+                            .clipped()
+                    }
+
+                    if let trace = HomeSceneTrace.resolve(visualTraceID: visualTraceID) {
+                        Image(trace.assetName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: proxy.size.width * trace.width)
+                            .position(x: proxy.size.width * trace.x, y: proxy.size.height * trace.y)
+                    }
+
+                    Image("SceneHomeCurtainFront")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .offset(x: reduceMotion ? 0 : (curtainDrifting ? 3 : -2))
+                        .opacity(0.34)
+                        .clipped()
+
+                    phase.tint.opacity(phase.tintOpacity)
+                    DogGoTheme.Colors.canvas.opacity(0.12)
+                }
+            }
+        }
+        .ignoresSafeArea()
+        .onAppear { curtainDrifting = !reduceMotion }
+        .animation(
+            reduceMotion ? nil : .easeInOut(duration: 4.8).repeatForever(autoreverses: true),
+            value: curtainDrifting
+        )
+        .accessibilityHidden(true)
+    }
+}
+
+private extension HomeTimePhase {
+    var tint: Color {
+        switch self {
+        case .morning: Color(red: 0.97, green: 0.87, blue: 0.66)
+        case .afternoon: Color(red: 0.91, green: 0.72, blue: 0.36)
+        case .evening: Color(red: 0.79, green: 0.52, blue: 0.36)
+        case .night: Color(red: 0.24, green: 0.32, blue: 0.38)
+        }
+    }
+
+    var tintOpacity: Double {
+        switch self {
+        case .morning: 0.12
+        case .afternoon: 0.10
+        case .evening: 0.22
+        case .night: 0.48
+        }
+    }
+
+    var sunPatchOpacity: Double {
+        switch self {
+        case .morning: 0.48
+        case .afternoon: 0.68
+        case .evening: 0.24
+        case .night: 0
+        }
+    }
+
+    var brightness: Double {
+        switch self {
+        case .morning: 0.03
+        case .afternoon: 0
+        case .evening: -0.06
+        case .night: -0.18
+        }
+    }
+
+    var dogBrightness: Double {
+        switch self {
+        case .morning: 0.02
+        case .afternoon: 0
+        case .evening: -0.03
+        case .night: -0.10
+        }
+    }
+
+    var dogSaturation: Double {
+        switch self {
+        case .morning, .afternoon: 1
+        case .evening: 0.94
+        case .night: 0.82
         }
     }
 }
@@ -213,11 +354,4 @@ private extension DogBehavior {
         }
     }
 
-    var symbolName: String {
-        switch self {
-        case .sleeping: "dog.fill"
-        case .observing: "dog.fill"
-        case .playing: "tennisball.fill"
-        }
-    }
 }
