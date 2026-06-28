@@ -15,6 +15,8 @@ struct HomeFoundationView: View {
     @State private var showingQuietCompany = false
     @State private var showingOurDays = false
     @State private var presentation = HomeLifePresentationModel()
+    @State private var interactionReaction: String?
+    @State private var reactionTask: Task<Void, Never>?
 #if DEBUG
     @State private var showingDebugPanel = false
 #endif
@@ -91,6 +93,19 @@ struct HomeFoundationView: View {
 
                 Spacer()
 
+                if let interactionReaction {
+                    Text(interactionReaction)
+                        .font(DogGoTheme.Typography.caption)
+                        .foregroundStyle(DogGoTheme.Colors.ink)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(DogGoTheme.Colors.canvas.opacity(0.84))
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .padding(.bottom, 10)
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                }
+
                 if let loadError {
                     VStack(spacing: 8) {
                         Text(loadError)
@@ -126,14 +141,23 @@ struct HomeFoundationView: View {
                 .buttonStyle(.plain)
                 .disabled(events.isEmpty)
 
-                Button("一起待会儿") { showingQuietCompany = true }
+                HStack(spacing: 10) {
+                    interactionButton("叫名字", systemImage: "waveform", interaction: .callName)
+                    interactionButton("轻轻摸摸", systemImage: "hand.raised", interaction: .gentlePet)
+                }
+                .padding(.top, 12)
+
+                Button("一起待会儿") {
+                    respond(to: .quietCompany)
+                    showingQuietCompany = true
+                }
                     .font(DogGoTheme.Typography.button)
                     .foregroundStyle(DogGoTheme.Colors.canvas)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 17)
                     .background(DogGoTheme.Colors.olive)
                     .clipShape(Capsule())
-                    .padding(.top, 14)
+                    .padding(.top, 10)
                     .accessibilityHint("进入安静陪伴")
             }
             .padding(.horizontal, DogGoTheme.Spacing.page)
@@ -171,7 +195,10 @@ struct HomeFoundationView: View {
                 .presentationDetents([.large])
         }
 #endif
-        .onDisappear { presentation.stop() }
+        .onDisappear {
+            presentation.stop()
+            reactionTask?.cancel()
+        }
     }
 
     @MainActor
@@ -188,6 +215,51 @@ struct HomeFoundationView: View {
             }
         } catch {
             loadError = "暂时没能准备好今天的片段。"
+        }
+    }
+
+    private func interactionButton(
+        _ title: String,
+        systemImage: String,
+        interaction: OnlineInteraction
+    ) -> some View {
+        Button {
+            respond(to: interaction)
+        } label: {
+            Label(title, systemImage: systemImage)
+                .font(DogGoTheme.Typography.button)
+                .foregroundStyle(DogGoTheme.Colors.olive)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(DogGoTheme.Colors.canvas.opacity(0.80))
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func respond(to interaction: OnlineInteraction) {
+        guard let state = states.first else { return }
+        let response = OnlineCompanionService().respond(
+            to: interaction,
+            dogName: dog.name,
+            mood: state.mood,
+            energy: state.energy,
+            socialTendency: state.socialTendency,
+            roll: Double.random(in: 0 ..< 1)
+        )
+        presentation.present(response: response)
+        reactionTask?.cancel()
+        withAnimation(.easeInOut(duration: 0.2)) {
+            interactionReaction = response.text
+        }
+        reactionTask = Task {
+            try? await Task.sleep(for: .seconds(3.2))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    interactionReaction = nil
+                }
+            }
         }
     }
 }
@@ -307,8 +379,6 @@ private extension HomeTimePhase {
 
 private struct QuietCompanionView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var breathing = false
 
     let dogName: String
 
@@ -316,15 +386,13 @@ private struct QuietCompanionView: View {
         ZStack {
             DogGoTheme.Colors.canvas.ignoresSafeArea()
             VStack(spacing: 22) {
-                Image(systemName: "dog.fill")
-                    .font(.system(size: 68, weight: .ultraLight))
-                    .foregroundStyle(DogGoTheme.Colors.ochre)
-                    .scaleEffect(reduceMotion ? 1 : (breathing ? 1.025 : 0.99), anchor: .bottom)
-                    .animation(
-                        reduceMotion ? nil : .easeInOut(duration: 2.8).repeatForever(autoreverses: true),
-                        value: breathing
-                    )
-                    .accessibilityHidden(true)
+                DogAnimationPlayerView(
+                    pose: .lieRest,
+                    cue: .blink,
+                    cueToken: 1,
+                    accessibilityLabel: "\(dogName)安静地趴在你身边"
+                )
+                .frame(height: 170)
 
                 Text("和\(dogName)一起待会儿")
                     .font(DogGoTheme.Typography.headline)
@@ -341,7 +409,6 @@ private struct QuietCompanionView: View {
             }
             .padding(DogGoTheme.Spacing.page)
         }
-        .onAppear { breathing = true }
     }
 }
 

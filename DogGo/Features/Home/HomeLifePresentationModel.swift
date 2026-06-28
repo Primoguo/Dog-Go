@@ -112,6 +112,22 @@ final class HomeLifePresentationModel {
         idleTask = nil
     }
 
+    func present(response: OnlineCompanionResponse) {
+        switch response.motion {
+        case .turnEar:
+            cue = .turnEar
+        case .lookBack:
+            pose = .standTurn
+            cue = .lookBack
+        case .wagTail:
+            cue = .wagTail
+        case .settle:
+            pose = .lieRest
+            cue = .blink
+        }
+        cueToken += 1
+    }
+
     private func advanceIdleMoment() {
         idleMomentsBeforePoseChange -= 1
         if idleMomentsBeforePoseChange <= 0 {
