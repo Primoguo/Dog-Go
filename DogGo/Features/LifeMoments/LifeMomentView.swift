@@ -41,6 +41,11 @@ struct LifeMomentView: View {
                             .foregroundStyle(DogGoTheme.Colors.ink)
                             .padding(.top, 12)
 
+                        if event.definitionID == "first_short_leave" {
+                            FirstShortLeaveReplay(dogName: dogName)
+                                .padding(.top, 20)
+                        }
+
                         Text(event.factSnapshot?.text ?? "\(dogName)度过了一小段自己的时间。")
                             .font(DogGoTheme.Typography.body)
                             .foregroundStyle(DogGoTheme.Colors.secondaryInk)
@@ -157,6 +162,123 @@ struct LifeMomentView: View {
             isSavingResponse = false
         }
     }
+}
+
+private struct FirstShortLeaveReplay: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var phase = LeaveReplayPhase.checkedDoor
+    @State private var replayToken = 0
+
+    let dogName: String
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ZStack(alignment: .bottom) {
+                Image("SceneHomeBase")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 300)
+                    .clipped()
+                    .overlay(Color.black.opacity(0.08))
+
+                DogAnimationPlayerView(
+                    pose: phase.pose,
+                    cue: phase.cue,
+                    cueToken: phase.rawValue + replayToken * LeaveReplayPhase.allCases.count,
+                    accessibilityLabel: phase.accessibilityLabel(dogName: dogName)
+                )
+                .frame(height: 205)
+                .offset(x: phase.horizontalOffset, y: -36)
+
+                Text(phase.caption(dogName: dogName))
+                    .font(DogGoTheme.Typography.caption)
+                    .foregroundStyle(DogGoTheme.Colors.ink)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(DogGoTheme.Colors.canvas.opacity(0.9))
+                    .clipShape(Capsule())
+                    .padding(14)
+                    .id(phase)
+                    .transition(.opacity)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+
+            HStack {
+                HStack(spacing: 6) {
+                    ForEach(LeaveReplayPhase.allCases, id: \.self) { item in
+                        Capsule()
+                            .fill(item == phase ? DogGoTheme.Colors.olive : DogGoTheme.Colors.ink.opacity(0.14))
+                            .frame(width: item == phase ? 22 : 7, height: 7)
+                    }
+                }
+                Spacer()
+                Button("再看一次", systemImage: "arrow.counterclockwise") {
+                    replayToken += 1
+                    phase = .checkedDoor
+                }
+                .font(DogGoTheme.Typography.caption)
+                .foregroundStyle(DogGoTheme.Colors.olive)
+            }
+        }
+        .task(id: replayToken) {
+            guard !reduceMotion else {
+                phase = .returned
+                return
+            }
+            for next in LeaveReplayPhase.allCases.dropFirst() {
+                try? await Task.sleep(for: .seconds(1.8))
+                guard !Task.isCancelled else { return }
+                withAnimation(.easeInOut(duration: 0.35)) { phase = next }
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("第一次短暂分别的画面回放")
+    }
+}
+
+private enum LeaveReplayPhase: Int, CaseIterable, Sendable {
+    case checkedDoor
+    case returnedToWindow
+    case livedQuietly
+    case returned
+
+    var pose: DogVisualPose {
+        switch self {
+        case .checkedDoor, .returned: .standTurn
+        case .returnedToWindow: .sitWindow
+        case .livedQuietly: .lieRest
+        }
+    }
+
+    var cue: DogAnimationCue {
+        switch self {
+        case .checkedDoor: .turnEar
+        case .returnedToWindow: .lookBack
+        case .livedQuietly: .blink
+        case .returned: .wagTail
+        }
+    }
+
+    var horizontalOffset: CGFloat {
+        switch self {
+        case .checkedDoor: -44
+        case .returnedToWindow: 32
+        case .livedQuietly: 10
+        case .returned: -12
+        }
+    }
+
+    func caption(dogName: String) -> String {
+        switch self {
+        case .checkedDoor: "门外安静后，\(dogName)去确认了一会儿。"
+        case .returnedToWindow: "随后，它自己回到了熟悉的窗边。"
+        case .livedQuietly: "门垫歪了一点，日子仍安静地继续。"
+        case .returned: "你回来时，它抬头、转耳，尾巴轻轻动了两下。"
+        }
+    }
+
+    func accessibilityLabel(dogName: String) -> String { caption(dogName: dogName) }
 }
 
 extension String {
