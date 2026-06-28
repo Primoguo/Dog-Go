@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "canvasPoints": { "width": 430, "height": 932 },
+  "layers": [
+    { "id": "base", "asset": "SceneHomeBase", "depth": 0 },
+    { "id": "back_sky", "asset": "SceneHomeBackSky", "depth": 10 },
+    { "id": "back_city", "asset": "SceneHomeBackCity", "depth": 20 },
+    { "id": "window", "asset": "SceneHomeWindow", "depth": 30 },
+    { "id": "curtain_back", "asset": "SceneHomeCurtainBack", "depth": 40 },
+    { "id": "floor", "asset": "SceneHomeFloor", "depth": 50 },
+    { "id": "furniture_left", "asset": "SceneHomeFurnitureLeft", "depth": 60 },
+    { "id": "furniture_right", "asset": "SceneHomeFurnitureRight", "depth": 60 },
+    { "id": "sun_patch", "asset": "SceneHomeSunPatch", "depth": 70 },
+    { "id": "curtain_front", "asset": "SceneHomeCurtainFront", "depth": 90 },
+    { "id": "front_vignette", "asset": "SceneHomeFrontVignette", "depth": 100 }
+  ],
+  "timeAppearances": {
+    "morning": {
+      "sceneTint": "#F7DFA8",
+      "tintOpacity": 0.12,
+      "sunPatchOpacity": 0.48,
+      "cityBrightness": 1.05
+    },
+    "afternoon": {
+      "sceneTint": "#E9B85D",
+      "tintOpacity": 0.10,
+      "sunPatchOpacity": 0.68,
+      "cityBrightness": 1.00
+    },
+    "evening": {
+      "sceneTint": "#C9855C",
+      "tintOpacity": 0.22,
+      "sunPatchOpacity": 0.24,
+      "cityBrightness": 0.82
+    },
+    "night": {
+      "sceneTint": "#3E5262",
+      "tintOpacity": 0.48,
+      "sunPatchOpacity": 0.00,
+      "cityBrightness": 0.54
+    }
+  },
+  "eventTraces": [
+    {
+      "id": "toy_moved",
+      "asset": "TraceToyMoved",
+      "position": { "x": 0.34, "y": 0.69 },
+      "width": 0.18
+    },
+    {
+      "id": "paper_bag",
+      "asset": "TracePaperBag",
+      "position": { "x": 0.72, "y": 0.68 },
+      "width": 0.20
+    },
+    {
+      "id": "nose_mark_on_window",
+      "asset": "TraceNoseMarkWindow",
+      "position": { "x": 0.60, "y": 0.36 },
+      "width": 0.10
+    }
+  ]
+}
