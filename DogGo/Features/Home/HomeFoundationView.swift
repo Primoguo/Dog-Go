@@ -33,7 +33,7 @@ struct HomeFoundationView: View {
 
     var body: some View {
         ZStack {
-            HomeSceneBackdrop(visualTraceID: events.first?.visualTraceID)
+            HomeSceneBackdrop(visualTraceIDs: events.compactMap(\.visualTraceID))
 
             VStack(spacing: 0) {
                 HStack {
@@ -76,8 +76,8 @@ struct HomeFoundationView: View {
                         cueToken: presentation.cueToken,
                         accessibilityLabel: "\(dog.name)正在\(currentBehavior.title)"
                     )
-                    .brightness(phase.dogBrightness)
-                    .saturation(phase.dogSaturation)
+                    .brightness(phase.ambient.dogBrightness)
+                    .saturation(phase.ambient.dogSaturation)
                 }
                 .frame(height: 230)
 
@@ -268,7 +268,7 @@ private struct HomeSceneBackdrop: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var curtainDrifting = false
 
-    let visualTraceID: String?
+    let visualTraceIDs: [String]
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
@@ -278,20 +278,20 @@ private struct HomeSceneBackdrop: View {
                     Image("SceneHomeBase")
                         .resizable()
                         .scaledToFill()
-                        .brightness(phase.brightness)
+                        .brightness(phase.ambient.brightness)
                         .frame(width: proxy.size.width, height: proxy.size.height)
                         .clipped()
 
-                    if phase.sunPatchOpacity > 0 {
+                    if phase.ambient.sunPatchOpacity > 0 {
                         Image("SceneHomeSunPatch")
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .opacity(phase.sunPatchOpacity)
+                            .opacity(phase.ambient.sunPatchOpacity)
                             .clipped()
                     }
 
-                    if let trace = HomeSceneTrace.resolve(visualTraceID: visualTraceID) {
+                    ForEach(Array(HomeSceneTrace.resolveMany(visualTraceIDs).enumerated()), id: \.offset) { _, trace in
                         Image(trace.assetName)
                             .resizable()
                             .scaledToFit()
@@ -307,7 +307,7 @@ private struct HomeSceneBackdrop: View {
                         .opacity(0.34)
                         .clipped()
 
-                    phase.tint.opacity(phase.tintOpacity)
+                    phase.tint.opacity(phase.ambient.tintOpacity)
                     DogGoTheme.Colors.canvas.opacity(0.12)
                 }
             }
@@ -332,49 +332,6 @@ private extension HomeTimePhase {
         }
     }
 
-    var tintOpacity: Double {
-        switch self {
-        case .morning: 0.12
-        case .afternoon: 0.10
-        case .evening: 0.22
-        case .night: 0.48
-        }
-    }
-
-    var sunPatchOpacity: Double {
-        switch self {
-        case .morning: 0.48
-        case .afternoon: 0.68
-        case .evening: 0.24
-        case .night: 0
-        }
-    }
-
-    var brightness: Double {
-        switch self {
-        case .morning: 0.03
-        case .afternoon: 0
-        case .evening: -0.06
-        case .night: -0.18
-        }
-    }
-
-    var dogBrightness: Double {
-        switch self {
-        case .morning: 0.02
-        case .afternoon: 0
-        case .evening: -0.03
-        case .night: -0.10
-        }
-    }
-
-    var dogSaturation: Double {
-        switch self {
-        case .morning, .afternoon: 1
-        case .evening: 0.94
-        case .night: 0.82
-        }
-    }
 }
 
 private struct QuietCompanionView: View {

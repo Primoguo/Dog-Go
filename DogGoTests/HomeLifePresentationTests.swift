@@ -20,6 +20,24 @@ final class HomeLifePresentationTests: XCTestCase {
         XCTAssertNil(HomeSceneTrace.resolve(visualTraceID: "blanket_new_fold"))
     }
 
+    func testTraceResolverKeepsRecentUniqueVisibleTraces() {
+        let traces = HomeSceneTrace.resolveMany([
+            "paper_bag_crumpled",
+            "nose_mark_on_window",
+            "paper_bag_crumpled",
+            "toy_returned_to_rug"
+        ])
+
+        XCTAssertEqual(traces.map(\.assetName), ["TracePaperBag", "TraceNoseMarkWindow", "TraceToyMoved"])
+    }
+
+    func testDaylightProfilesProgressFromSunPatchToNightTint() {
+        XCTAssertGreaterThan(HomeTimePhase.afternoon.ambient.sunPatchOpacity, HomeTimePhase.evening.ambient.sunPatchOpacity)
+        XCTAssertEqual(HomeTimePhase.night.ambient.sunPatchOpacity, 0)
+        XCTAssertGreaterThan(HomeTimePhase.night.ambient.tintOpacity, HomeTimePhase.morning.ambient.tintOpacity)
+        XCTAssertLessThan(HomeTimePhase.night.ambient.dogSaturation, HomeTimePhase.afternoon.ambient.dogSaturation)
+    }
+
     func testEveryBehaviorHasAStablePoseAndAutonomousAlternatives() {
         for behavior in DogBehavior.allCases {
             let poses = HomeIdlePlanner.poses(for: behavior)

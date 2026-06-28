@@ -49,6 +49,38 @@ struct HomeSceneTrace: Equatable, Sendable {
         }
         return nil
     }
+
+    static func resolveMany(_ visualTraceIDs: [String], limit: Int = 3) -> [HomeSceneTrace] {
+        var seenAssets = Set<String>()
+        return visualTraceIDs
+            .compactMap(resolve(visualTraceID:))
+            .filter { seenAssets.insert($0.assetName).inserted }
+            .prefix(limit)
+            .map { $0 }
+    }
+}
+
+struct HomeAmbientProfile: Equatable, Sendable {
+    let tintOpacity: Double
+    let sunPatchOpacity: Double
+    let brightness: Double
+    let dogBrightness: Double
+    let dogSaturation: Double
+}
+
+extension HomeTimePhase {
+    var ambient: HomeAmbientProfile {
+        switch self {
+        case .morning:
+            HomeAmbientProfile(tintOpacity: 0.12, sunPatchOpacity: 0.48, brightness: 0.03, dogBrightness: 0.02, dogSaturation: 1)
+        case .afternoon:
+            HomeAmbientProfile(tintOpacity: 0.10, sunPatchOpacity: 0.68, brightness: 0, dogBrightness: 0, dogSaturation: 1)
+        case .evening:
+            HomeAmbientProfile(tintOpacity: 0.22, sunPatchOpacity: 0.24, brightness: -0.06, dogBrightness: -0.03, dogSaturation: 0.94)
+        case .night:
+            HomeAmbientProfile(tintOpacity: 0.48, sunPatchOpacity: 0, brightness: -0.18, dogBrightness: -0.10, dogSaturation: 0.82)
+        }
+    }
 }
 
 enum HomeIdlePlanner {
