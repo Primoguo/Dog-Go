@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "canvasPixels3x": { "width": 768, "height": 768 },
+  "poses": [
+    {
+      "id": "sit_window",
+      "groundAnchor": { "x": 0.5, "y": 0.94 },
+      "assets": {
+        "full": "DogSitWindow",
+        "shadow": "DogSitWindowShadow",
+        "body": "DogSitWindowBody",
+        "frontLegs": "DogSitWindowFrontLegs",
+        "rearLeg": "DogSitWindowRearLeg",
+        "tail": "DogSitWindowTail",
+        "head": "DogSitWindowHead",
+        "earFar": "DogSitWindowEarFar",
+        "earNear": "DogSitWindowEarNear",
+        "eyesOpen": "DogSitWindowEyesOpen",
+        "eyesClosed": "DogSitWindowEyesClosed",
+        "muzzle": "DogSitWindowMuzzle"
+      }
+    },
+    {
+      "id": "lie_rest",
+      "groundAnchor": { "x": 0.5, "y": 0.94 },
+      "assets": {
+        "full": "DogLieRest",
+        "shadow": "DogLieRestShadow",
+        "body": "DogLieRestBody",
+        "frontLegs": "DogLieRestFrontLegs",
+        "rearLeg": "DogLieRestRearLeg",
+        "tail": "DogLieRestTail",
+        "head": "DogLieRestHead",
+        "earFar": "DogLieRestEarFar",
+        "earNear": "DogLieRestEarNear",
+        "eyesOpen": "DogLieRestEyesOpen",
+        "eyesClosed": "DogLieRestEyesClosed",
+        "muzzle": "DogLieRestMuzzle"
+      }
+    },
+    {
+      "id": "stand_turn",
+      "groundAnchor": { "x": 0.5, "y": 0.94 },
+      "assets": {
+        "full": "DogStandTurn",
+        "shadow": "DogStandTurnShadow",
+        "body": "DogStandTurnBody",
+        "frontLegs": "DogStandTurnFrontLegs",
+        "rearLeg": "DogStandTurnRearLeg",
+        "tail": "DogStandTurnTail",
+        "head": "DogStandTurnHead",
+        "earFar": "DogStandTurnEarFar",
+        "earNear": "DogStandTurnEarNear",
+        "eyesOpen": "DogStandTurnEyesOpen",
+        "eyesClosed": "DogStandTurnEyesClosed",
+        "muzzle": "DogStandTurnMuzzle"
+      }
+    },
+    {
+      "id": "play_bow",
+      "groundAnchor": { "x": 0.5, "y": 0.94 },
+      "assets": {
+        "full": "DogPlayBow",
+        "shadow": "DogPlayBowShadow",
+        "body": "DogPlayBowBody",
+        "frontLegs": "DogPlayBowFrontLegs",
+        "rearLeg": "DogPlayBowRearLeg",
+        "tail": "DogPlayBowTail",
+        "head": "DogPlayBowHead",
+        "earFar": "DogPlayBowEarFar",
+        "earNear": "DogPlayBowEarNear",
+        "eyesOpen": "DogPlayBowEyesOpen",
+        "eyesClosed": "DogPlayBowEyesClosed",
+        "muzzle": "DogPlayBowMuzzle"
+      }
+    }
+  ]
+}
