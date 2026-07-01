@@ -29,11 +29,43 @@ struct HomeFoundationView: View {
     }
 
     private var unreadEvents: [LifeEventRecord] { events.filter { !$0.isViewed } }
-    private var currentBehavior: DogBehavior { states.first?.currentBehavior ?? .observing }
+    private var sceneTraces: [HomeSceneTrace] {
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-sceneObjectPreview") {
+            return HomeSceneTrace.resolveMany([
+                "nose_mark_on_window",
+                "paper_bag_crumpled",
+                "toy_returned_to_rug"
+            ])
+        }
+#endif
+        return HomeSceneTrace.resolveMany(events.compactMap(\.visualTraceID))
+    }
+    private var currentBehavior: DogBehavior {
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-autonomyPreview") {
+            return .observing
+        }
+#endif
+        return states.first?.currentBehavior ?? .observing
+    }
 
     var body: some View {
         ZStack {
-            HomeSceneBackdrop(visualTraceIDs: events.compactMap(\.visualTraceID))
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                HomeSpriteSceneView(
+                    input: DogSpriteSceneInput(
+                        pose: presentation.pose,
+                        cue: presentation.cue,
+                        cueToken: presentation.cueToken,
+                        anchor: presentation.anchor,
+                        phase: presentation.autonomyPhase,
+                        timePhase: HomeTimePhase.resolved(date: context.date),
+                        reduceMotion: reduceMotion,
+                        traces: sceneTraces
+                    )
+                )
+            }
 
             VStack(spacing: 0) {
                 HStack {
@@ -64,32 +96,31 @@ struct HomeFoundationView: View {
 
                 Spacer(minLength: 36)
 
-                Text("\(dog.name)正在\(currentBehavior.title)")
+                Text(
+                    currentBehavior == .observing
+                        ? "\(dog.name)\(presentation.autonomyPhase.title)"
+                        : "\(dog.name)正在\(currentBehavior.title)"
+                )
                     .font(DogGoTheme.Typography.headline)
                     .foregroundStyle(DogGoTheme.Colors.ink)
 
-                TimelineView(.periodic(from: .now, by: 60)) { context in
-                    let phase = HomeTimePhase(date: context.date)
-                    DogAnimationPlayerView(
-                        pose: presentation.pose,
-                        cue: presentation.cue,
-                        cueToken: presentation.cueToken,
-                        accessibilityLabel: "\(dog.name)正在\(currentBehavior.title)"
-                    )
-                    .brightness(phase.ambient.dogBrightness)
-                    .saturation(phase.ambient.dogSaturation)
-                }
+                Color.clear
                 .frame(height: 230)
 
-                TimelineView(.periodic(from: .now, by: 60)) { context in
-                    Text(HomeTimePhase(date: context.date).caption)
-                }
+                Text(
+                    currentBehavior == .observing
+                        ? presentation.autonomyPhase.observation
+                        : HomeTimePhase.resolved(date: .now).caption
+                )
                     .font(DogGoTheme.Typography.caption)
                     .foregroundStyle(DogGoTheme.Colors.secondaryInk)
+                    .multilineTextAlignment(.center)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 7)
                     .background(DogGoTheme.Colors.canvas.opacity(0.72))
                     .clipShape(Capsule())
+                    .padding(.top, 36)
+                    .animation(.easeInOut(duration: 0.25), value: presentation.autonomyPhase)
 
                 Spacer()
 
@@ -166,9 +197,18 @@ struct HomeFoundationView: View {
         .task {
             await refreshLife()
             presentation.start(behavior: currentBehavior, reduceMotion: reduceMotion)
+            presentation.present(sceneObjectStates: HomeSceneObjectState.resolve(from: sceneTraces))
+#if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("-quietCompanyPreview") {
+                showingQuietCompany = true
+            }
+#endif
         }
         .onChange(of: currentBehavior) { _, behavior in
             presentation.update(behavior: behavior, reduceMotion: reduceMotion)
+        }
+        .onChange(of: sceneTraces) { _, traces in
+            presentation.present(sceneObjectStates: HomeSceneObjectState.resolve(from: traces))
         }
         .onChange(of: reduceMotion) { _, value in
             presentation.start(behavior: currentBehavior, reduceMotion: value)
@@ -265,14 +305,9 @@ struct HomeFoundationView: View {
 }
 
 private struct HomeSceneBackdrop: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var curtainDrifting = false
-
-    let visualTraceIDs: [String]
-
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
-            let phase = HomeTimePhase(date: context.date)
+            let phase = HomeTimePhase.resolved(date: context.date)
             GeometryReader { proxy in
                 ZStack {
                     Image("SceneHomeBase")
@@ -282,42 +317,12 @@ private struct HomeSceneBackdrop: View {
                         .frame(width: proxy.size.width, height: proxy.size.height)
                         .clipped()
 
-                    if phase.ambient.sunPatchOpacity > 0 {
-                        Image("SceneHomeSunPatch")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: proxy.size.width, height: proxy.size.height)
-                            .opacity(phase.ambient.sunPatchOpacity)
-                            .clipped()
-                    }
-
-                    ForEach(Array(HomeSceneTrace.resolveMany(visualTraceIDs).enumerated()), id: \.offset) { _, trace in
-                        Image(trace.assetName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: proxy.size.width * trace.width)
-                            .position(x: proxy.size.width * trace.x, y: proxy.size.height * trace.y)
-                    }
-
-                    Image("SceneHomeCurtainFront")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: proxy.size.width, height: proxy.size.height)
-                        .offset(x: reduceMotion ? 0 : (curtainDrifting ? 3 : -2))
-                        .opacity(0.34)
-                        .clipped()
-
                     phase.tint.opacity(phase.ambient.tintOpacity)
-                    DogGoTheme.Colors.canvas.opacity(0.12)
+                    DogGoTheme.Colors.canvas.opacity(0.06)
                 }
             }
         }
         .ignoresSafeArea()
-        .onAppear { curtainDrifting = !reduceMotion }
-        .animation(
-            reduceMotion ? nil : .easeInOut(duration: 4.8).repeatForever(autoreverses: true),
-            value: curtainDrifting
-        )
         .accessibilityHidden(true)
     }
 }
@@ -325,6 +330,7 @@ private struct HomeSceneBackdrop: View {
 private extension HomeTimePhase {
     var tint: Color {
         switch self {
+        case .dawn: Color(red: 0.95, green: 0.82, blue: 0.68)
         case .morning: Color(red: 0.97, green: 0.87, blue: 0.66)
         case .afternoon: Color(red: 0.91, green: 0.72, blue: 0.36)
         case .evening: Color(red: 0.79, green: 0.52, blue: 0.36)

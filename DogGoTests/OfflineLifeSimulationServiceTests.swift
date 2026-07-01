@@ -97,6 +97,7 @@ final class OfflineLifeSimulationServiceTests: XCTestCase {
     }
 
     private func makeSetup() throws -> (
+        container: ModelContainer,
         context: ModelContext,
         dog: DogProfile,
         state: DogState,
@@ -118,6 +119,6 @@ final class OfflineLifeSimulationServiceTests: XCTestCase {
             in: context,
             clock: FixedClock(now: start)
         )
-        return (context, dog, state, start)
+        return (container, context, dog, state, start)
     }
 }

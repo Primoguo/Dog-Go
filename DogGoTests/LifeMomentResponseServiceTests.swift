@@ -60,6 +60,7 @@ final class LifeMomentResponseServiceTests: XCTestCase {
     }
 
     private func makeSetup() throws -> (
+        container: ModelContainer,
         context: ModelContext,
         event: LifeEventRecord,
         definition: EventDefinition,
@@ -85,7 +86,7 @@ final class LifeMomentResponseServiceTests: XCTestCase {
         )
         context.insert(event)
         try context.save()
-        return (context, event, definition, response)
+        return (container, context, event, definition, response)
     }
 }
 
