@@ -4,27 +4,48 @@ import SwiftUI
 enum DogVisualPose: String, CaseIterable, Sendable {
     case sitWindow
     case lieRest
+    case lieAlert
     case standTurn
+    case walkA
+    case walkB
     case playBow
 
     var assets: DogPoseAssets {
         switch self {
-        case .sitWindow: DogPoseAssets(prefix: "DogSitWindow")
-        case .lieRest: DogPoseAssets(prefix: "DogLieRest")
-        case .standTurn: DogPoseAssets(prefix: "DogStandTurn")
-        case .playBow: DogPoseAssets(prefix: "DogPlayBow")
+        case .sitWindow: DogPoseAssets(full: "ChestnutSitWindow")
+        case .lieRest: DogPoseAssets(full: "ChestnutRestUnifiedV2")
+        case .lieAlert: DogPoseAssets(full: "ChestnutRestAlertV2")
+        case .standTurn: DogPoseAssets(full: "ChestnutStandTurn")
+        case .walkA: DogPoseAssets(full: "ChestnutWalkA")
+        case .walkB: DogPoseAssets(full: "ChestnutWalkB")
+        // The approved play-bow asset has not been produced yet. Reuse the
+        // new Chestnut standing pose so the app never falls back to the old,
+        // photorealistic character during a playing state.
+        case .playBow: DogPoseAssets(full: "ChestnutStandTurn")
         }
     }
 }
 
 struct DogPoseAssets: Equatable, Sendable {
     let full: String
-    let shadow: String
-    let earNear: String
-    let earFar: String
-    let eyesClosed: String
-    let tail: String
-    let head: String
+    let shadow: String?
+    let earNear: String?
+    let earFar: String?
+    let eyesClosed: String?
+    let tail: String?
+    let head: String?
+
+    var usesLayeredAnimation: Bool { head != nil }
+
+    init(full: String) {
+        self.full = full
+        shadow = nil
+        earNear = nil
+        earFar = nil
+        eyesClosed = nil
+        tail = nil
+        head = nil
+    }
 
     init(prefix: String) {
         full = prefix
@@ -191,38 +212,47 @@ struct DogAnimationPlayerView: View {
 
     var body: some View {
         ZStack {
-            Image(assets.shadow)
-                .resizable()
-                .scaledToFit()
+            if let shadow = assets.shadow {
+                Image(shadow).resizable().scaledToFit()
+            }
 
             Image(assets.full)
                 .resizable()
                 .scaledToFit()
+                .contentTransition(.identity)
 
-            Image(assets.head)
-                .resizable()
-                .scaledToFit()
-                .offset(x: model.headOffset)
-
-            Image(assets.earFar)
-                .resizable()
-                .scaledToFit()
-                .rotationEffect(.degrees(-model.earRotation), anchor: pose.earFarAnchor)
-
-            Image(assets.earNear)
-                .resizable()
-                .scaledToFit()
-                .rotationEffect(.degrees(model.earRotation), anchor: pose.earNearAnchor)
-
-            Image(assets.tail)
-                .resizable()
-                .scaledToFit()
-                .rotationEffect(.degrees(model.tailRotation), anchor: pose.tailAnchor)
-
-            Image(assets.eyesClosed)
-                .resizable()
-                .scaledToFit()
-                .opacity(model.isBlinking ? 1 : 0)
+            if assets.usesLayeredAnimation {
+                if let head = assets.head {
+                    Image(head)
+                        .resizable()
+                        .scaledToFit()
+                        .offset(x: model.headOffset)
+                }
+                if let earFar = assets.earFar {
+                    Image(earFar)
+                        .resizable()
+                        .scaledToFit()
+                        .rotationEffect(.degrees(-model.earRotation), anchor: pose.earFarAnchor)
+                }
+                if let earNear = assets.earNear {
+                    Image(earNear)
+                        .resizable()
+                        .scaledToFit()
+                        .rotationEffect(.degrees(model.earRotation), anchor: pose.earNearAnchor)
+                }
+                if let tail = assets.tail {
+                    Image(tail)
+                        .resizable()
+                        .scaledToFit()
+                        .rotationEffect(.degrees(model.tailRotation), anchor: pose.tailAnchor)
+                }
+                if let eyesClosed = assets.eyesClosed {
+                    Image(eyesClosed)
+                        .resizable()
+                        .scaledToFit()
+                        .opacity(model.isBlinking ? 1 : 0)
+                }
+            }
         }
         .scaleEffect(
             reduceMotion ? 1 : (breathing ? 1.012 : 0.997),
@@ -253,8 +283,8 @@ private extension DogVisualPose {
     var earFarAnchor: UnitPoint {
         switch self {
         case .sitWindow: UnitPoint(x: 0.35, y: 0.20)
-        case .lieRest: UnitPoint(x: 0.22, y: 0.56)
-        case .standTurn: UnitPoint(x: 0.16, y: 0.23)
+        case .lieRest, .lieAlert: UnitPoint(x: 0.22, y: 0.56)
+        case .standTurn, .walkA, .walkB: UnitPoint(x: 0.16, y: 0.23)
         case .playBow: UnitPoint(x: 0.24, y: 0.61)
         }
     }
@@ -262,8 +292,8 @@ private extension DogVisualPose {
     var earNearAnchor: UnitPoint {
         switch self {
         case .sitWindow: UnitPoint(x: 0.41, y: 0.22)
-        case .lieRest: UnitPoint(x: 0.33, y: 0.58)
-        case .standTurn: UnitPoint(x: 0.30, y: 0.24)
+        case .lieRest, .lieAlert: UnitPoint(x: 0.33, y: 0.58)
+        case .standTurn, .walkA, .walkB: UnitPoint(x: 0.30, y: 0.24)
         case .playBow: UnitPoint(x: 0.35, y: 0.63)
         }
     }
@@ -271,8 +301,8 @@ private extension DogVisualPose {
     var tailAnchor: UnitPoint {
         switch self {
         case .sitWindow: UnitPoint(x: 0.68, y: 0.78)
-        case .lieRest: UnitPoint(x: 0.80, y: 0.80)
-        case .standTurn: UnitPoint(x: 0.72, y: 0.28)
+        case .lieRest, .lieAlert: UnitPoint(x: 0.80, y: 0.80)
+        case .standTurn, .walkA, .walkB: UnitPoint(x: 0.72, y: 0.28)
         case .playBow: UnitPoint(x: 0.72, y: 0.30)
         }
     }
