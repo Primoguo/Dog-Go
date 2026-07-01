@@ -2,6 +2,7 @@ import Foundation
 import Observation
 
 enum HomeTimePhase: String, CaseIterable, Sendable {
+    case dawn
     case morning
     case afternoon
     case evening
@@ -13,8 +14,9 @@ enum HomeTimePhase: String, CaseIterable, Sendable {
 
     init(hour: Int) {
         switch hour {
-        case 5 ... 10: self = .morning
-        case 11 ... 16: self = .afternoon
+        case 5 ... 7: self = .dawn
+        case 8 ... 11: self = .morning
+        case 12 ... 16: self = .afternoon
         case 17 ... 20: self = .evening
         default: self = .night
         }
@@ -22,11 +24,24 @@ enum HomeTimePhase: String, CaseIterable, Sendable {
 
     var caption: String {
         switch self {
-        case .morning: "晨光刚刚爬上窗沿。"
+        case .dawn: "天刚亮，房间里还是柔和的晨光。"
+        case .morning: "上午的阳光慢慢爬过窗沿。"
         case .afternoon: "阳光落在耳朵上，窗帘轻轻动了一下。"
         case .evening: "城市慢慢暗下来，房间还留着一点暖色。"
         case .night: "窗外安静了，房间只剩柔和的光。"
         }
+    }
+
+    static func resolved(date: Date, calendar: Calendar = .current) -> HomeTimePhase {
+#if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if let flagIndex = arguments.firstIndex(of: "-homeTimePhase"),
+           arguments.indices.contains(flagIndex + 1),
+           let override = HomeTimePhase(rawValue: arguments[flagIndex + 1]) {
+            return override
+        }
+#endif
+        return HomeTimePhase(date: date, calendar: calendar)
     }
 }
 
@@ -49,6 +64,10 @@ struct HomeSceneObjectSpec: Equatable, Sendable {
         HomeSceneObjectSpec(id: .toyArea, normalizedX: 0.64, normalizedY: 0.54, interactionRadius: 0.14),
         HomeSceneObjectSpec(id: .paperBag, normalizedX: 0.78, normalizedY: 0.47, interactionRadius: 0.11)
     ]
+
+    static func livingRoomSpec(for id: HomeSceneObjectID) -> HomeSceneObjectSpec {
+        livingRoom.first { $0.id == id }!
+    }
 }
 
 struct HomeSceneTrace: Equatable, Sendable {
@@ -57,16 +76,28 @@ struct HomeSceneTrace: Equatable, Sendable {
     let y: Double
     let width: Double
 
+    var objectID: HomeSceneObjectID {
+        switch assetName {
+        case "TraceNoseMarkWindow": .curtain
+        case "TracePaperBag": .paperBag
+        case "TraceToyMoved": .toyArea
+        default: .dogBed
+        }
+    }
+
     static func resolve(visualTraceID: String?) -> HomeSceneTrace? {
         guard let visualTraceID else { return nil }
         if visualTraceID.contains("nose_mark") {
-            return HomeSceneTrace(assetName: "TraceNoseMarkWindow", x: 0.60, y: 0.36, width: 0.10)
+            let object = HomeSceneObjectSpec.livingRoomSpec(for: .curtain)
+            return HomeSceneTrace(assetName: "TraceNoseMarkWindow", x: object.normalizedX, y: object.normalizedY, width: 0.10)
         }
         if visualTraceID.contains("paper_bag") {
-            return HomeSceneTrace(assetName: "TracePaperBag", x: 0.72, y: 0.68, width: 0.20)
+            let object = HomeSceneObjectSpec.livingRoomSpec(for: .paperBag)
+            return HomeSceneTrace(assetName: "TracePaperBag", x: object.normalizedX, y: object.normalizedY, width: 0.13)
         }
         if visualTraceID.contains("toy") {
-            return HomeSceneTrace(assetName: "TraceToyMoved", x: 0.34, y: 0.69, width: 0.18)
+            let object = HomeSceneObjectSpec.livingRoomSpec(for: .toyArea)
+            return HomeSceneTrace(assetName: "TraceToyMoved", x: object.normalizedX, y: object.normalizedY, width: 0.13)
         }
         return nil
     }
@@ -81,6 +112,36 @@ struct HomeSceneTrace: Equatable, Sendable {
     }
 }
 
+enum HomeSceneObjectVisualState: Equatable, Sendable {
+    case unchanged
+    case windowMarked
+    case toyMoved
+    case paperBagCrumpled
+}
+
+struct HomeSceneObjectState: Equatable, Sendable {
+    let objectID: HomeSceneObjectID
+    let visualState: HomeSceneObjectVisualState
+
+    static func resolve(from traces: [HomeSceneTrace]) -> [HomeSceneObjectState] {
+        let byObject = Dictionary(uniqueKeysWithValues: traces.map { trace in
+            let state: HomeSceneObjectVisualState = switch trace.objectID {
+            case .curtain: .windowMarked
+            case .toyArea: .toyMoved
+            case .paperBag: .paperBagCrumpled
+            case .dogBed: .unchanged
+            }
+            return (trace.objectID, state)
+        })
+        return HomeSceneObjectID.allCases.map { objectID in
+            HomeSceneObjectState(
+                objectID: objectID,
+                visualState: byObject[objectID] ?? .unchanged
+            )
+        }
+    }
+}
+
 struct HomeAmbientProfile: Equatable, Sendable {
     let tintOpacity: Double
     let sunPatchOpacity: Double
@@ -92,6 +153,8 @@ struct HomeAmbientProfile: Equatable, Sendable {
 extension HomeTimePhase {
     var ambient: HomeAmbientProfile {
         switch self {
+        case .dawn:
+            HomeAmbientProfile(tintOpacity: 0.16, sunPatchOpacity: 0.24, brightness: 0.01, dogBrightness: 0.01, dogSaturation: 0.96)
         case .morning:
             HomeAmbientProfile(tintOpacity: 0.12, sunPatchOpacity: 0.48, brightness: 0.03, dogBrightness: 0.02, dogSaturation: 1)
         case .afternoon:
@@ -318,6 +381,16 @@ final class HomeLifePresentationModel {
             cue = .blink
         }
         cueToken += 1
+    }
+
+    func present(sceneObjectStates: [HomeSceneObjectState]) {
+        if sceneObjectStates.contains(where: { $0.visualState == .paperBagCrumpled }) {
+            cue = .turnEar
+            cueToken += 1
+        } else if sceneObjectStates.contains(where: { $0.visualState == .toyMoved }) {
+            cue = .wagTail
+            cueToken += 1
+        }
     }
 
     private func advanceIdleMoment() {

@@ -4,13 +4,16 @@ import XCTest
 final class HomeLifePresentationTests: XCTestCase {
     func testTimePhaseBoundaries() {
         XCTAssertEqual(HomeTimePhase(hour: 4), .night)
-        XCTAssertEqual(HomeTimePhase(hour: 5), .morning)
-        XCTAssertEqual(HomeTimePhase(hour: 10), .morning)
-        XCTAssertEqual(HomeTimePhase(hour: 11), .afternoon)
+        XCTAssertEqual(HomeTimePhase(hour: 5), .dawn)
+        XCTAssertEqual(HomeTimePhase(hour: 7), .dawn)
+        XCTAssertEqual(HomeTimePhase(hour: 8), .morning)
+        XCTAssertEqual(HomeTimePhase(hour: 11), .morning)
+        XCTAssertEqual(HomeTimePhase(hour: 12), .afternoon)
         XCTAssertEqual(HomeTimePhase(hour: 16), .afternoon)
         XCTAssertEqual(HomeTimePhase(hour: 17), .evening)
         XCTAssertEqual(HomeTimePhase(hour: 20), .evening)
         XCTAssertEqual(HomeTimePhase(hour: 21), .night)
+        XCTAssertEqual(HomeTimePhase.allCases, [.dawn, .morning, .afternoon, .evening, .night])
     }
 
     func testEventTraceMappingUsesAvailableSceneAssets() {
@@ -29,6 +32,26 @@ final class HomeLifePresentationTests: XCTestCase {
         ])
 
         XCTAssertEqual(traces.map(\.assetName), ["TracePaperBag", "TraceNoseMarkWindow", "TraceToyMoved"])
+    }
+
+    func testEventTracesResolveToTheirSceneObjectStates() {
+        let traces = HomeSceneTrace.resolveMany([
+            "paper_bag_crumpled",
+            "nose_mark_on_window",
+            "toy_returned_to_rug"
+        ])
+        let states = HomeSceneObjectState.resolve(from: traces)
+
+        XCTAssertEqual(states.first { $0.objectID == .paperBag }?.visualState, .paperBagCrumpled)
+        XCTAssertEqual(states.first { $0.objectID == .curtain }?.visualState, .windowMarked)
+        XCTAssertEqual(states.first { $0.objectID == .toyArea }?.visualState, .toyMoved)
+        XCTAssertEqual(states.first { $0.objectID == .dogBed }?.visualState, .unchanged)
+
+        for trace in traces {
+            let object = HomeSceneObjectSpec.livingRoomSpec(for: trace.objectID)
+            XCTAssertEqual(trace.x, object.normalizedX)
+            XCTAssertEqual(trace.y, object.normalizedY)
+        }
     }
 
     func testDaylightProfilesProgressFromSunPatchToNightTint() {
@@ -56,6 +79,24 @@ final class HomeLifePresentationTests: XCTestCase {
         XCTAssertEqual(HomeAutonomyPhase.rising.focusedObjectID, .curtain)
         XCTAssertEqual(HomeAutonomyPhase.movingToWindow.focusedObjectID, .curtain)
         XCTAssertEqual(HomeAutonomyPhase.observingWindow.focusedObjectID, .curtain)
+    }
+
+    @MainActor
+    func testObjectStateChangesTriggerACharacterReaction() {
+        let model = HomeLifePresentationModel()
+        let initialToken = model.cueToken
+
+        model.present(sceneObjectStates: [
+            HomeSceneObjectState(objectID: .toyArea, visualState: .toyMoved)
+        ])
+        XCTAssertEqual(model.cue, .wagTail)
+        XCTAssertEqual(model.cueToken, initialToken + 1)
+
+        model.present(sceneObjectStates: [
+            HomeSceneObjectState(objectID: .paperBag, visualState: .paperBagCrumpled)
+        ])
+        XCTAssertEqual(model.cue, .turnEar)
+        XCTAssertEqual(model.cueToken, initialToken + 2)
     }
 
     func testEveryBehaviorHasAStablePoseAndAutonomousAlternatives() {

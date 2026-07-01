@@ -30,7 +30,16 @@ struct HomeFoundationView: View {
 
     private var unreadEvents: [LifeEventRecord] { events.filter { !$0.isViewed } }
     private var sceneTraces: [HomeSceneTrace] {
-        HomeSceneTrace.resolveMany(events.compactMap(\.visualTraceID))
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-sceneObjectPreview") {
+            return HomeSceneTrace.resolveMany([
+                "nose_mark_on_window",
+                "paper_bag_crumpled",
+                "toy_returned_to_rug"
+            ])
+        }
+#endif
+        return HomeSceneTrace.resolveMany(events.compactMap(\.visualTraceID))
     }
     private var currentBehavior: DogBehavior {
 #if DEBUG
@@ -51,7 +60,7 @@ struct HomeFoundationView: View {
                         cueToken: presentation.cueToken,
                         anchor: presentation.anchor,
                         phase: presentation.autonomyPhase,
-                        timePhase: HomeTimePhase(date: context.date),
+                        timePhase: HomeTimePhase.resolved(date: context.date),
                         reduceMotion: reduceMotion,
                         traces: sceneTraces
                     )
@@ -101,7 +110,7 @@ struct HomeFoundationView: View {
                 Text(
                     currentBehavior == .observing
                         ? presentation.autonomyPhase.observation
-                        : HomeTimePhase(date: .now).caption
+                        : HomeTimePhase.resolved(date: .now).caption
                 )
                     .font(DogGoTheme.Typography.caption)
                     .foregroundStyle(DogGoTheme.Colors.secondaryInk)
@@ -188,6 +197,7 @@ struct HomeFoundationView: View {
         .task {
             await refreshLife()
             presentation.start(behavior: currentBehavior, reduceMotion: reduceMotion)
+            presentation.present(sceneObjectStates: HomeSceneObjectState.resolve(from: sceneTraces))
 #if DEBUG
             if ProcessInfo.processInfo.arguments.contains("-quietCompanyPreview") {
                 showingQuietCompany = true
@@ -196,6 +206,9 @@ struct HomeFoundationView: View {
         }
         .onChange(of: currentBehavior) { _, behavior in
             presentation.update(behavior: behavior, reduceMotion: reduceMotion)
+        }
+        .onChange(of: sceneTraces) { _, traces in
+            presentation.present(sceneObjectStates: HomeSceneObjectState.resolve(from: traces))
         }
         .onChange(of: reduceMotion) { _, value in
             presentation.start(behavior: currentBehavior, reduceMotion: value)
@@ -294,7 +307,7 @@ struct HomeFoundationView: View {
 private struct HomeSceneBackdrop: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
-            let phase = HomeTimePhase(date: context.date)
+            let phase = HomeTimePhase.resolved(date: context.date)
             GeometryReader { proxy in
                 ZStack {
                     Image("SceneHomeBase")
@@ -317,6 +330,7 @@ private struct HomeSceneBackdrop: View {
 private extension HomeTimePhase {
     var tint: Color {
         switch self {
+        case .dawn: Color(red: 0.95, green: 0.82, blue: 0.68)
         case .morning: Color(red: 0.97, green: 0.87, blue: 0.66)
         case .afternoon: Color(red: 0.91, green: 0.72, blue: 0.36)
         case .evening: Color(red: 0.79, green: 0.52, blue: 0.36)

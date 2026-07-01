@@ -133,3 +133,38 @@ final result: stage 01 passed
 - 无永久停留在 Reaction、姿态缩放沿用、Sheet 角色放大等回归。
 
 final result: stage 02 passed
+
+---
+
+# Dog Go M1.0 第三阶段场景一 — 最终验收
+
+## 完成范围
+
+- 阳光层由硬边加色多边形改为 38pt 高斯柔化、低透明度 Alpha 混合，并缩小投射范围。
+- 窗帘风迹只在 `noticingCurtain` 阶段出现，位置绑定窗帘区域；减少动态效果开启时停止循环动画。
+- 玩具与纸袋使用场景对象锚点作为唯一坐标真源，事件痕迹不再使用旧的游离坐标。
+- 玩具移动显示同画风对象状态，纸袋压皱改为原纸袋上的折痕反馈，避免重复摆放第二个纸袋。
+- 玩具状态触发栗子摇尾，纸袋状态触发单耳转动；对象状态与角色 Reaction 形成反馈闭环。
+- 时间模型由四档补齐为清晨、上午、下午、傍晚、夜晚五档，并提供仅 DEBUG 使用的固定时段参数。
+- 修复对象反馈与姿态切换同帧发生时，cue 贴图恢复原始像素尺寸导致栗子全屏放大的回归；每次反应贴图切换后强制保持拟合尺寸。
+
+## 验收证据
+
+- 对象状态反馈：`design/qa/m1.0-scene-01/02-object-state-feedback.png`
+- 窗帘风迹：`design/qa/m1.0-scene-01/03-curtain-breeze.png`
+- 清晨：`design/qa/m1.0-scene-01/time-phases/dawn.png`
+- 上午：`design/qa/m1.0-scene-01/time-phases/morning.png`
+- 下午：`design/qa/m1.0-scene-01/time-phases/afternoon.png`
+- 傍晚：`design/qa/m1.0-scene-01/time-phases/evening.png`
+- 夜晚：`design/qa/m1.0-scene-01/time-phases/night.png`
+
+## 验证
+
+- iPhone 17 Pro / iOS 26.5 模拟器构建成功。
+- 完整测试：55/55 通过，0 失败，0 跳过。
+- 阳光层边缘与亮度通过静态截图复核；不再出现原先横跨地毯的硬亮多边形。
+- 五时段均可独立强制预览，并使用独立背景资产：清晨粉紫天空、上午清蓝天空、下午高亮暖阳、傍晚城市初亮灯、夜晚深蓝天空与城市窗灯。
+- 窗外昼夜变化来自五张同构图场景资产，不再依赖整屏暗色滤镜或矩形窗格遮罩；角色同时接受轻微环境染色。
+- 对象反馈截图中栗子比例稳定、狗窝遮挡稳定，纸袋折痕附着原对象，玩具状态位于玩具区域。
+
+final result: stage 03 passed

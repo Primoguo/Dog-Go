@@ -1,3 +1,4 @@
+import CoreImage
 import SpriteKit
 import SwiftUI
 
@@ -49,6 +50,7 @@ final class HomeSpriteScene: SKScene {
     private let bodyNode = SKSpriteNode()
     private let foregroundLayer = SKNode()
     private let dogBedFrontNode = SKSpriteNode(imageNamed: "SceneHomeDogBedFront")
+    private let sunPatchEffectNode = SKEffectNode()
     private let sunPatchNode = SKShapeNode()
     private let lightingNode = SKSpriteNode(color: .clear, size: .zero)
     private let restOpenTexture = SKTexture(imageNamed: "ChestnutRestUnifiedV2")
@@ -85,7 +87,7 @@ final class HomeSpriteScene: SKScene {
         currentInput = input
         updateLighting(for: input.timePhase)
         if previous?.traces != input.traces {
-            updateTraces(input.traces)
+            updateTraces(input.traces, reduceMotion: input.reduceMotion)
         }
         if previous?.phase != input.phase {
             updateEnvironment(for: input.phase, reduceMotion: input.reduceMotion)
@@ -97,9 +99,13 @@ final class HomeSpriteScene: SKScene {
             let isRestTransition = Set([previous?.pose, input.pose].compactMap { $0 })
                 == Set([.lieRest, .lieAlert])
             if isRestTransition, !input.reduceMotion {
+                // Set and fit synchronously. Deferring the texture swap inside an
+                // SKAction can leave the sprite at the source image's native size
+                // while SwiftUI submits a cue in the same render pass.
+                bodyNode.texture = nextTexture
+                fitBodyTexture()
+                bodyNode.alpha = 0.90
                 bodyNode.run(.sequence([
-                    .fadeAlpha(to: 0.90, duration: 0.10),
-                    .setTexture(nextTexture, resize: false),
                     .fadeAlpha(to: 1, duration: 0.14)
                 ]), withKey: "poseTransition")
             } else {
@@ -142,7 +148,7 @@ final class HomeSpriteScene: SKScene {
         contactShadowNode.zPosition = -1
         dogRoot.zPosition = Layer.dog
         foregroundLayer.zPosition = Layer.foreground
-        sunPatchNode.zPosition = Layer.lighting - 1
+        sunPatchEffectNode.zPosition = Layer.lighting - 1
         lightingNode.zPosition = Layer.lighting
 
         contactShadowNode.fillColor = SKColor(white: 0, alpha: 0.12)
@@ -159,10 +165,16 @@ final class HomeSpriteScene: SKScene {
         addChild(environmentLayer)
         addChild(dogRoot)
         addChild(foregroundLayer)
-        addChild(sunPatchNode)
+        addChild(sunPatchEffectNode)
         addChild(lightingNode)
         foregroundLayer.addChild(dogBedFrontNode)
         environmentLayer.addChild(curtainBreezeNode)
+        sunPatchEffectNode.addChild(sunPatchNode)
+        sunPatchEffectNode.filter = CIFilter(
+            name: "CIGaussianBlur",
+            parameters: [kCIInputRadiusKey: 38]
+        )
+        sunPatchEffectNode.shouldRasterize = true
         layoutScene()
     }
 
@@ -182,15 +194,15 @@ final class HomeSpriteScene: SKScene {
         lightingNode.size = size
         lightingNode.position = .zero
         let sunPath = CGMutablePath()
-        sunPath.move(to: CGPoint(x: -size.width * 0.06, y: size.height * 0.20))
-        sunPath.addLine(to: CGPoint(x: size.width * 0.34, y: size.height * 0.20))
-        sunPath.addLine(to: CGPoint(x: size.width * 0.08, y: -size.height * 0.20))
-        sunPath.addLine(to: CGPoint(x: -size.width * 0.34, y: -size.height * 0.20))
+        sunPath.move(to: CGPoint(x: -size.width * 0.02, y: size.height * 0.12))
+        sunPath.addLine(to: CGPoint(x: size.width * 0.24, y: size.height * 0.12))
+        sunPath.addLine(to: CGPoint(x: size.width * 0.07, y: -size.height * 0.13))
+        sunPath.addLine(to: CGPoint(x: -size.width * 0.22, y: -size.height * 0.13))
         sunPath.closeSubpath()
         sunPatchNode.path = sunPath
-        sunPatchNode.fillColor = SKColor(red: 1, green: 0.82, blue: 0.42, alpha: 1)
+        sunPatchNode.fillColor = SKColor(red: 1, green: 0.84, blue: 0.56, alpha: 0.35)
         sunPatchNode.strokeColor = .clear
-        sunPatchNode.blendMode = .add
+        sunPatchNode.blendMode = .alpha
         let breezePath = CGMutablePath()
         breezePath.move(to: CGPoint(x: size.width * 0.08, y: size.height * 0.17))
         breezePath.addCurve(
@@ -215,7 +227,7 @@ final class HomeSpriteScene: SKScene {
         contactShadowNode.position = CGPoint(x: 0, y: -bodyNode.size.height * 0.34)
     }
 
-    private func updateTraces(_ traces: [HomeSceneTrace]) {
+    private func updateTraces(_ traces: [HomeSceneTrace], reduceMotion: Bool) {
         traceLayer.removeAllChildren()
         for trace in traces {
             let node = makeTraceNode(for: trace)
@@ -224,6 +236,13 @@ final class HomeSpriteScene: SKScene {
                 y: (0.5 - trace.y) * size.height
             )
             traceLayer.addChild(node)
+            guard !reduceMotion, trace.objectID == .toyArea || trace.objectID == .paperBag else { continue }
+            node.alpha = 0
+            node.setScale(0.92)
+            node.run(.group([
+                .fadeIn(withDuration: 0.28),
+                .scale(to: 1, duration: 0.34)
+            ]), withKey: "objectStateFeedback")
         }
     }
 
@@ -243,6 +262,16 @@ final class HomeSpriteScene: SKScene {
         let root = SKNode()
         let width = size.width * trace.width
 
+        if trace.objectID == .toyArea {
+            let sprite = SKSpriteNode(imageNamed: trace.assetName)
+            let textureSize = sprite.texture?.size() ?? CGSize(width: 1, height: 1)
+            let scale = width / textureSize.width
+            sprite.size = CGSize(width: width, height: textureSize.height * scale)
+            sprite.alpha = 0.90
+            root.addChild(sprite)
+            return root
+        }
+
         switch trace.assetName {
         case "TraceNoseMarkWindow":
             let smudge = SKShapeNode(ellipseOf: CGSize(width: width * 0.42, height: width * 0.32))
@@ -260,13 +289,13 @@ final class HomeSpriteScene: SKScene {
 
         case "TracePaperBag":
             let path = CGMutablePath()
-            path.move(to: CGPoint(x: -width * 0.18, y: width * 0.06))
-            path.addLine(to: CGPoint(x: -width * 0.04, y: -width * 0.05))
-            path.addLine(to: CGPoint(x: width * 0.08, y: width * 0.04))
-            path.addLine(to: CGPoint(x: width * 0.19, y: -width * 0.07))
+            path.move(to: CGPoint(x: -width * 0.26, y: width * 0.12))
+            path.addLine(to: CGPoint(x: -width * 0.08, y: -width * 0.10))
+            path.addLine(to: CGPoint(x: width * 0.06, y: width * 0.08))
+            path.addLine(to: CGPoint(x: width * 0.24, y: -width * 0.13))
             let crease = SKShapeNode(path: path)
-            crease.strokeColor = SKColor(red: 0.38, green: 0.24, blue: 0.12, alpha: 0.16)
-            crease.lineWidth = 1.2
+            crease.strokeColor = SKColor(red: 0.30, green: 0.18, blue: 0.09, alpha: 0.38)
+            crease.lineWidth = 1.4
             crease.lineCap = .round
             root.addChild(crease)
 
@@ -344,14 +373,22 @@ final class HomeSpriteScene: SKScene {
         reactionTask?.cancel()
         animationState = .reaction
         let reactionDuration: Duration
+        let fittedSize = bodyNode.size
+        let preserveFittedSize = SKAction.resize(
+            toWidth: fittedSize.width,
+            height: fittedSize.height,
+            duration: 0
+        )
         switch cue {
         case .blink:
             reactionDuration = .milliseconds(260)
             if currentInput?.pose == .lieRest {
                 bodyNode.run(.sequence([
                     .setTexture(restBlinkTexture, resize: false),
+                    preserveFittedSize,
                     .wait(forDuration: 0.12),
-                    .setTexture(restOpenTexture, resize: false)
+                    .setTexture(restOpenTexture, resize: false),
+                    preserveFittedSize
                 ]), withKey: "cueTexture")
             } else {
                 bodyNode.run(.sequence([.fadeAlpha(to: 0.92, duration: 0.08), .fadeAlpha(to: 1, duration: 0.08)]))
@@ -361,8 +398,10 @@ final class HomeSpriteScene: SKScene {
             if currentInput?.pose == .lieRest {
                 bodyNode.run(.sequence([
                     .setTexture(restEarTexture, resize: false),
+                    preserveFittedSize,
                     .wait(forDuration: 0.22),
-                    .setTexture(restOpenTexture, resize: false)
+                    .setTexture(restOpenTexture, resize: false),
+                    preserveFittedSize
                 ]), withKey: "cueTexture")
             } else {
                 bodyNode.run(.sequence([.rotate(byAngle: 0.025, duration: 0.16), .rotate(byAngle: -0.025, duration: 0.22)]))
@@ -383,15 +422,48 @@ final class HomeSpriteScene: SKScene {
 
     private func updateLighting(for phase: HomeTimePhase) {
         let color: SKColor
+        let dogTint: SKColor
+        let dogTintStrength: CGFloat
         switch phase {
-        case .morning: color = SKColor(red: 1, green: 0.90, blue: 0.70, alpha: 0.08)
-        case .afternoon: color = SKColor(red: 1, green: 0.75, blue: 0.40, alpha: 0.06)
-        case .evening: color = SKColor(red: 0.76, green: 0.42, blue: 0.25, alpha: 0.16)
-        case .night: color = SKColor(red: 0.16, green: 0.24, blue: 0.34, alpha: 0.34)
+        case .dawn:
+            color = SKColor(red: 0.92, green: 0.78, blue: 0.72, alpha: 0.02)
+            dogTint = SKColor(red: 0.70, green: 0.62, blue: 0.78, alpha: 1)
+            dogTintStrength = 0.07
+        case .morning:
+            color = SKColor(red: 1, green: 0.94, blue: 0.76, alpha: 0.01)
+            dogTint = .white
+            dogTintStrength = 0
+        case .afternoon:
+            color = SKColor(red: 1, green: 0.72, blue: 0.35, alpha: 0.02)
+            dogTint = SKColor(red: 1, green: 0.82, blue: 0.56, alpha: 1)
+            dogTintStrength = 0.03
+        case .evening:
+            color = SKColor(red: 0.76, green: 0.40, blue: 0.23, alpha: 0.04)
+            dogTint = SKColor(red: 0.62, green: 0.36, blue: 0.28, alpha: 1)
+            dogTintStrength = 0.13
+        case .night:
+            color = SKColor(red: 0.18, green: 0.24, blue: 0.30, alpha: 0.07)
+            dogTint = SKColor(red: 0.18, green: 0.28, blue: 0.42, alpha: 1)
+            dogTintStrength = 0.22
         }
+        backgroundNode.texture = SKTexture(imageNamed: phase.sceneAssetName)
+        bodyNode.color = dogTint
+        bodyNode.colorBlendFactor = dogTintStrength
         lightingNode.color = color
         lightingNode.colorBlendFactor = 1
-        sunPatchNode.alpha = CGFloat(phase.ambient.sunPatchOpacity * 0.10)
+        sunPatchEffectNode.alpha = CGFloat(phase.ambient.sunPatchOpacity * 0.12)
+    }
+}
+
+private extension HomeTimePhase {
+    var sceneAssetName: String {
+        switch self {
+        case .dawn: "SceneHomeDawn"
+        case .morning: "SceneHomeMorning"
+        case .afternoon: "SceneHomeAfternoon"
+        case .evening: "SceneHomeEvening"
+        case .night: "SceneHomeNight"
+        }
     }
 }
 

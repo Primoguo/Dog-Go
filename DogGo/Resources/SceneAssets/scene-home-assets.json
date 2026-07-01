@@ -15,6 +15,12 @@
     { "id": "front_vignette", "asset": "SceneHomeFrontVignette", "depth": 100 }
   ],
   "timeAppearances": {
+    "dawn": {
+      "sceneTint": "#F2D1AD",
+      "tintOpacity": 0.16,
+      "sunPatchOpacity": 0.24,
+      "cityBrightness": 0.96
+    },
     "morning": {
       "sceneTint": "#F7DFA8",
       "tintOpacity": 0.12,
@@ -44,19 +50,19 @@
     {
       "id": "toy_moved",
       "asset": "TraceToyMoved",
-      "position": { "x": 0.34, "y": 0.69 },
-      "width": 0.18
+      "position": { "x": 0.64, "y": 0.54 },
+      "width": 0.13
     },
     {
       "id": "paper_bag",
       "asset": "TracePaperBag",
-      "position": { "x": 0.72, "y": 0.68 },
-      "width": 0.20
+      "position": { "x": 0.78, "y": 0.47 },
+      "width": 0.13
     },
     {
       "id": "nose_mark_on_window",
       "asset": "TraceNoseMarkWindow",
-      "position": { "x": 0.60, "y": 0.36 },
+      "position": { "x": 0.63, "y": 0.31 },
       "width": 0.10
     }
   ]
